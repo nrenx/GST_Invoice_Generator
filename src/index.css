@@ -9,39 +9,50 @@ All colors MUST be HSL.
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 220 25% 15%;
+    --foreground: 0 0% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 25% 15%;
+    --card-foreground: 0 0% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 15%;
+    --popover-foreground: 0 0% 10%;
 
-    --primary: 221 83% 25%;
+    /* Primary: Deep teal/navy - Excel header RGB(47, 80, 97) converted to HSL */
+    --primary: 194 35% 28%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 221 83% 25%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 10%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 25 95% 53%;
+    /* Accent: Orange-red - Excel sheet tab RGB(255, 69, 0) converted to HSL */
+    --accent: 16 100% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 221 83% 25%;
+    --border: 0 0% 10%;
+    --input: 0 0% 96%;
+    --ring: 194 35% 45%;
 
-    --radius: 0.5rem;
+    --radius: 0rem;
 
-    --invoice-header: 221 83% 25%;
-    --invoice-accent: 25 95% 53%;
-    --section-bg: 210 40% 98%;
-    --table-header: 220 25% 96%;
+    /* Invoice specific colors matching Excel VBA structure */
+    --invoice-header: 194 35% 28%;           /* RGB(47, 80, 97) */
+    --invoice-header-fg: 0 0% 100%;          /* White text on header */
+    --invoice-accent: 16 100% 50%;           /* RGB(255, 69, 0) */
+    --section-bg: 0 0% 96%;                  /* RGB(245, 245, 245) */
+    --table-header: 0 0% 90%;                /* RGB(230, 230, 230) */
+    --company-info-bg: 0 0% 96%;             /* RGB(245, 245, 245) */
+    --amount-words-header: 60 100% 50%;      /* RGB(255, 255, 0) - yellow */
+    --amount-words-bg: 60 100% 95%;          /* RGB(255, 255, 230) - light yellow */
+    --total-after-tax-bg: 48 100% 50%;       /* RGB(255, 215, 0) - gold */
+    --terms-header-bg: 60 100% 50%;          /* RGB(255, 255, 0) - yellow */
+    --terms-content-bg: 60 100% 98%;         /* RGB(255, 255, 245) - very light yellow */
+    --user-input-color: 346 83% 47%;         /* RGB(220, 20, 60) - red for user input */
   }
 
   .dark {
