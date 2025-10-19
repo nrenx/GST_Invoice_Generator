@@ -181,11 +181,10 @@ const InvoicePreview = () => {
         {/* Original Page */}
         <div 
           data-page="original"
-          className="bg-white shadow-lg mx-auto border-2 border-black invoice-container mb-8"
+          className="bg-white shadow-lg mx-auto border-2 border-black invoice-container"
           style={{
             width: "100%",
             maxWidth: "210mm",
-            minHeight: "297mm",
             fontFamily: "'Segoe UI', Arial, sans-serif",
             display: currentPage === "original" ? "block" : "none"
           }}
@@ -210,7 +209,6 @@ const InvoicePreview = () => {
           style={{
             width: "100%",
             maxWidth: "210mm",
-            minHeight: "297mm",
             fontFamily: "'Segoe UI', Arial, sans-serif",
             display: currentPage === "duplicate" ? "block" : "none"
           }}
