@@ -7,6 +7,7 @@ const SELECTED_PROFILE_KEY = 'selected-profile-id';
 export const useProfiles = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const stored = localStorage.getItem(PROFILES_STORAGE_KEY);
@@ -21,6 +22,8 @@ export const useProfiles = () => {
     if (selectedId) {
       setSelectedProfileId(selectedId);
     }
+    
+    setIsLoading(false);
   }, []);
 
   const saveProfiles = (newProfiles: Profile[]) => {
@@ -60,6 +63,7 @@ export const useProfiles = () => {
     profiles,
     selectedProfileId,
     selectedProfile: getSelectedProfile(),
+    isLoading,
     addProfile,
     updateProfile,
     deleteProfile,

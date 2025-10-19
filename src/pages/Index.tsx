@@ -6,16 +6,16 @@ import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
 
 const Index = () => {
-  const { selectedProfile } = useProfiles();
+  const { selectedProfile, isLoading } = useProfiles();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!selectedProfile) {
+    if (!isLoading && !selectedProfile) {
       navigate("/profiles");
     }
-  }, [selectedProfile, navigate]);
+  }, [selectedProfile, isLoading, navigate]);
 
-  if (!selectedProfile) {
+  if (isLoading || !selectedProfile) {
     return null;
   }
 
