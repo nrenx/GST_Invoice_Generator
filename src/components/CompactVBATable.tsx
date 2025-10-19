@@ -303,12 +303,6 @@ export function CompactVBATable({
   ];
   const displayTerms = termsLines.length > 0 ? termsLines : defaultTerms;
 
-  const acknowledgementLines = [
-    'Received the goods in good condition.',
-    'Certified that the particulars given above are true and correct.',
-    'This is an electronically generated invoice.',
-  ];
-
   const amountWordsText = safeText(amountInWords);
 
   const totalQuantity = invoiceData.items.reduce((acc, item) => acc + (Number.isFinite(item.quantity) ? item.quantity : 0), 0);
@@ -605,16 +599,12 @@ export function CompactVBATable({
         <tr>
           <td colSpan={5} style={signatureHeaderCellStyle}>Transporter</td>
           <td colSpan={5} style={signatureHeaderCellStyle}>Receiver</td>
-          <td colSpan={5} style={signatureHeaderCellStyle}>Acknowledgement</td>
+          <td colSpan={5} style={signatureHeaderCellStyle}>Certified that the particulars given above are true and correct</td>
         </tr>
         <tr>
           <td colSpan={5} rowSpan={2} style={signatureSubCellStyle}>Mobile No.: ___________________</td>
           <td colSpan={5} rowSpan={2} style={signatureSubCellStyle}>Mobile No.: ___________________</td>
-          <td colSpan={5} rowSpan={2} style={{ ...signatureSubCellStyle, lineHeight: 1.4 }}>
-            {acknowledgementLines.map((line, index) => (
-              <div key={`ack-${index}`} style={{ marginBottom: '4px' }}>{line}</div>
-            ))}
-          </td>
+          <td colSpan={5} rowSpan={2} style={signatureSubCellStyle}>Mobile No.: ___________________</td>
         </tr>
         <tr />
         <tr>
