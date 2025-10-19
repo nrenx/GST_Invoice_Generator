@@ -1,19 +1,51 @@
 import { InvoiceForm } from "@/components/InvoiceForm";
-import { FileText } from "lucide-react";
+import { FileText, User } from "lucide-react";
+import { useProfiles } from "@/hooks/useProfiles";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 
 const Index = () => {
+  const { selectedProfile } = useProfiles();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!selectedProfile) {
+      navigate("/profiles");
+    }
+  }, [selectedProfile, navigate]);
+
+  if (!selectedProfile) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-section-bg">
       {/* Header */}
       <header className="bg-invoice-header text-primary-foreground shadow-lg">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center gap-3">
-            <div className="bg-accent p-2 rounded-lg">
-              <FileText className="h-8 w-8 text-accent-foreground" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-accent p-2 rounded-lg">
+                <FileText className="h-8 w-8 text-accent-foreground" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold">GST Tax Invoice Generator</h1>
+                <p className="text-primary-foreground/80 text-sm">Professional invoice creation system</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold">GST Tax Invoice Generator</h1>
-              <p className="text-primary-foreground/80 text-sm">Professional invoice creation system</p>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 bg-primary-foreground/10 px-4 py-2 rounded-lg">
+                <User className="h-5 w-5" />
+                <span className="font-semibold">{selectedProfile.name}</span>
+              </div>
+              <Button 
+                variant="secondary" 
+                onClick={() => navigate("/profiles")}
+                className="gap-2"
+              >
+                Switch Profile
+              </Button>
             </div>
           </div>
         </div>
@@ -29,7 +61,7 @@ const Index = () => {
               After completing the form, you can preview the invoice or download it as a PDF.
             </p>
           </div>
-          <InvoiceForm />
+          <InvoiceForm profile={selectedProfile} />
         </div>
       </main>
     </div>

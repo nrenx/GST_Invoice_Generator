@@ -2,14 +2,18 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { InvoiceData } from "@/types/invoice";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Download, Plus } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { CompactVBATable } from "@/components/CompactVBATable";
+import { StandardInvoiceTemplate } from "@/components/templates/StandardInvoiceTemplate";
+import { ModernInvoiceTemplate } from "@/components/templates/ModernInvoiceTemplate";
+import { TemplateSelector } from "@/components/TemplateSelector";
 
 const InvoicePreview = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState<"original" | "duplicate">("original");
+  const [selectedTemplate, setSelectedTemplate] = useState<"standard" | "modern">("standard");
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
   const invoiceData = location.state as InvoiceData;
 
   if (!invoiceData) {
@@ -162,6 +166,9 @@ const InvoicePreview = () => {
             <Button variant="outline" onClick={togglePage} className="gap-2">
               View {currentPage === "original" ? "Duplicate" : "Original"}
             </Button>
+            <Button variant="outline" onClick={() => setShowTemplateSelector(true)} className="gap-2">
+              Change Template
+            </Button>
           </div>
           <h1 className="text-xl font-bold text-center flex-1">
             Invoice Preview - {currentPage.toUpperCase()}
@@ -189,7 +196,7 @@ const InvoicePreview = () => {
             display: currentPage === "original" ? "block" : "none"
           }}
         >
-          <CompactVBATable 
+          {selectedTemplate === "standard" ? <StandardInvoiceTemplate
             invoiceData={invoiceData} 
             pageType="ORIGINAL"
             totalTaxableValue={totalTaxableValue}
@@ -199,7 +206,17 @@ const InvoicePreview = () => {
             totalTax={totalTax}
             grandTotal={grandTotal}
             amountInWords={amountInWords}
-          />
+          /> : <ModernInvoiceTemplate
+            invoiceData={invoiceData}
+            pageType="ORIGINAL"
+            totalTaxableValue={totalTaxableValue}
+            totalCGST={totalCGST}
+            totalSGST={totalSGST}
+            totalIGST={totalIGST}
+            totalTax={totalTax}
+            grandTotal={grandTotal}
+            amountInWords={amountInWords}
+          />}
         </div>
 
         {/* Duplicate Page */}
@@ -213,7 +230,7 @@ const InvoicePreview = () => {
             display: currentPage === "duplicate" ? "block" : "none"
           }}
         >
-          <CompactVBATable 
+          {selectedTemplate === "standard" ? <StandardInvoiceTemplate
             invoiceData={invoiceData} 
             pageType="DUPLICATE"
             totalTaxableValue={totalTaxableValue}
@@ -223,9 +240,29 @@ const InvoicePreview = () => {
             totalTax={totalTax}
             grandTotal={grandTotal}
             amountInWords={amountInWords}
-          />
+          /> : <ModernInvoiceTemplate
+            invoiceData={invoiceData}
+            pageType="DUPLICATE"
+            totalTaxableValue={totalTaxableValue}
+            totalCGST={totalCGST}
+            totalSGST={totalSGST}
+            totalIGST={totalIGST}
+            totalTax={totalTax}
+            grandTotal={grandTotal}
+            amountInWords={amountInWords}
+          />}
         </div>
       </div>
+
+      <TemplateSelector
+        open={showTemplateSelector}
+        onClose={() => setShowTemplateSelector(false)}
+        onSelectTemplate={(template) => {
+          setSelectedTemplate(template);
+          setShowTemplateSelector(false);
+          toast.success(`Switched to ${template} template`);
+        }}
+      />
     </div>
   );
 };

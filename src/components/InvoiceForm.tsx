@@ -156,16 +156,16 @@ const buildDefaultItem = (): ItemFormValue => {
   };
 };
 
-const buildBaseDefaults = (): InvoiceFormData => {
+const buildBaseDefaults = (profile?: Profile): InvoiceFormData => {
   const today = getTodayForInput();
 
   return {
-    companyName: "KAVERI TRADERS",
-    companyAddress: "191, Guduru, Pagadalapalli, Idulapalli, Tirupati, Andhra Pradesh - 524409",
-    companyGSTIN: "37HERPB7733F1Z5",
-    companyEmail: "kotidarisetty7777@gmail.com",
-    companyState: "Andhra Pradesh",
-    companyStateCode: "37",
+    companyName: profile?.companyDetails.companyName || "KAVERI TRADERS",
+    companyAddress: profile?.companyDetails.address || "191, Guduru, Pagadalapalli, Idulapalli, Tirupati, Andhra Pradesh - 524409",
+    companyGSTIN: profile?.companyDetails.gstin || "37HERPB7733F1Z5",
+    companyEmail: profile?.companyDetails.email || "kotidarisetty7777@gmail.com",
+    companyState: profile?.companyDetails.state || "Andhra Pradesh",
+    companyStateCode: profile?.companyDetails.stateCode || "37",
   invoiceNumber: "INV-2025-12",
     invoiceDate: today,
     invoiceType: "Tax Invoice",
@@ -191,7 +191,7 @@ const buildBaseDefaults = (): InvoiceFormData => {
     consigneeState: "",
     consigneeStateCode: "",
     items: [buildDefaultItem()],
-    termsAndConditions: TERMS_TEMPLATE,
+    termsAndConditions: profile?.termsAndConditions || TERMS_TEMPLATE,
   };
 };
 
@@ -212,8 +212,8 @@ const mergeItemsWithDefaults = (items: unknown[]): InvoiceFormData["items"] => {
   });
 };
 
-const getDefaultValues = (): InvoiceFormData => {
-  const baseDefaults = buildBaseDefaults();
+const getDefaultValues = (profile?: Profile): InvoiceFormData => {
+  const baseDefaults = buildBaseDefaults(profile);
 
   if (typeof window === "undefined") {
     return baseDefaults;
@@ -292,12 +292,18 @@ function calculateItemTotals(item: ItemFormValue, saleType: string): InvoiceItem
   };
 }
 
-export const InvoiceForm = () => {
+import { Profile } from "@/types/profile";
+
+interface InvoiceFormProps {
+  profile: Profile;
+}
+
+export const InvoiceForm = ({ profile }: InvoiceFormProps) => {
   const navigate = useNavigate();
 
   const { register, control, handleSubmit, watch, setValue, formState: { errors }, reset } = useForm<InvoiceFormData>({
     resolver: zodResolver(invoiceSchema),
-    defaultValues: getDefaultValues(),
+    defaultValues: getDefaultValues(profile),
   });
 
   const { fields, append, remove } = useFieldArray({

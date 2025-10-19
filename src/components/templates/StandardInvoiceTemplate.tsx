@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 
-import type { InvoiceData, InvoiceItem } from '../types/invoice';
+import type { InvoiceData, InvoiceItem } from '@/types/invoice';
 
 type FormatAmountOptions = {
   allowZero?: boolean;
@@ -66,7 +66,7 @@ const computeAmount = (item?: InvoiceItem | null): number | undefined => {
   return Number.isFinite(amount) ? amount : undefined;
 };
 
-export function CompactVBATable({
+export function StandardInvoiceTemplate({
   invoiceData,
   pageType,
   totalTaxableValue,

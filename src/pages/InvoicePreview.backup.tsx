@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Download, Plus } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
-import { CompactVBATable } from "@/components/CompactVBATable";
+import { StandardInvoiceTemplate } from "@/components/templates/StandardInvoiceTemplate";
 
 const InvoicePreview = () => {
   const location = useLocation();
@@ -216,7 +216,7 @@ const InvoicePreview = () => {
             pageBreakAfter: currentPage === "original" ? "always" : "auto"
           }}
         >
-          <CompactVBATable 
+          <StandardInvoiceTemplate
             invoiceData={invoiceData} 
             pageType="ORIGINAL"
             totalTaxableValue={totalTaxableValue}
@@ -239,7 +239,7 @@ const InvoicePreview = () => {
             display: currentPage === "duplicate" ? "block" : "none"
           }}
         >
-          <CompactVBATable 
+          <StandardInvoiceTemplate 
             invoiceData={invoiceData} 
             pageType="DUPLICATE"
             totalTaxableValue={totalTaxableValue}
