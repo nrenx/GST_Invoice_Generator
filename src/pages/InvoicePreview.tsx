@@ -14,6 +14,7 @@ const InvoicePreview = () => {
   const [currentPage, setCurrentPage] = useState<"original" | "duplicate">("original");
   const [selectedTemplate, setSelectedTemplate] = useState<"standard" | "modern">("standard");
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const invoiceData = location.state as InvoiceData;
 
   if (!invoiceData) {
@@ -22,58 +23,81 @@ const InvoicePreview = () => {
   }
 
   const handleDownloadPDF = () => {
-    // Force both pages to be visible for printing (like VBA exports both Original and Duplicate)
-    const originalPage = document.querySelector('[data-page="original"]') as HTMLElement;
-    const duplicatePage = document.querySelector('[data-page="duplicate"]') as HTMLElement;
-    
-    // Show both pages for PDF
-    if (originalPage) originalPage.style.display = 'block';
-    if (duplicatePage) duplicatePage.style.display = 'block';
+    if (isGeneratingPdf) {
+      return;
+    }
 
-    // Apply print styles that match VBA page setup exactly
-    const style = document.createElement('style');
-    style.textContent = `
+    const body = document.body;
+    if (!body) {
+      toast.error("Unable to access document body for printing");
+      return;
+    }
+
+  const originalPage = document.querySelector('[data-page="original"]') as HTMLElement | null;
+  const duplicatePage = document.querySelector('[data-page="duplicate"]') as HTMLElement | null;
+  const selectedPageAfterExport = currentPage;
+
+    setIsGeneratingPdf(true);
+
+    body.classList.add("exporting-pdf");
+
+    let cleanedUp = false;
+    const cleanupCallbacks: Array<() => void> = [];
+
+    const restorePageVisibility = () => {
+      if (originalPage) {
+        originalPage.style.display = selectedPageAfterExport === "original" ? "block" : "none";
+      }
+      if (duplicatePage) {
+        duplicatePage.style.display = selectedPageAfterExport === "duplicate" ? "block" : "none";
+      }
+    };
+
+    let restoreVisibilityCallbackAdded = false;
+    const ensureRestoreCallback = () => {
+      if (!restoreVisibilityCallbackAdded) {
+        cleanupCallbacks.push(restorePageVisibility);
+        restoreVisibilityCallbackAdded = true;
+      }
+    };
+
+    if (originalPage) {
+      ensureRestoreCallback();
+      originalPage.style.display = "block";
+    }
+
+    if (duplicatePage) {
+      ensureRestoreCallback();
+      duplicatePage.style.display = "block";
+    }
+
+    const inlinePrintStyles = document.createElement("style");
+    inlinePrintStyles.setAttribute("data-pdf-print-style", "true");
+    inlinePrintStyles.textContent = `
       @media print {
-        .no-print {
-          display: none !important;
-        }
-
-        @page {
-          size: A4 portrait;
-          margin: 0.15in;
-          -webkit-print-color-adjust: exact;
-          color-adjust: exact;
-          print-color-adjust: exact;
-        }
-
         html, body {
           width: 100%;
-          height: auto;
+          min-height: 100%;
           margin: 0;
           padding: 0;
-          -webkit-print-color-adjust: exact;
-          color-adjust: exact;
-          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
         }
 
         .invoice-preview-wrapper {
           background: transparent !important;
-          padding: 0 !important;
-          gap: 0 !important;
         }
 
-        /* Match the printable area (210mm minus 0.15in margins on both sides) */
         .invoice-container {
           width: calc(210mm - 0.3in) !important;
           min-height: calc(297mm - 0.3in) !important;
           margin: 0 auto !important;
-          padding: 0 !important;
           box-sizing: border-box !important;
           page-break-inside: avoid !important;
           page-break-after: avoid !important;
           display: block !important;
-          transform: none !important;
-          transform-origin: top center !important;
+          box-shadow: none !important;
+          border-width: 2px !important;
         }
 
         .invoice-container + .invoice-container {
@@ -83,35 +107,68 @@ const InvoicePreview = () => {
         table {
           width: 100% !important;
           border-collapse: collapse !important;
-          border: 2px solid black !important;
-          margin: 0 !important;
-          padding: 0 !important;
         }
 
         td, th {
-          border: 1px solid black !important;
-          margin: 0 !important;
-          -webkit-print-color-adjust: exact !important;
-          color-adjust: exact !important;
-          print-color-adjust: exact !important;
+          border: 1px solid #000000 !important;
           word-break: break-word !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
         }
       }
     `;
-    document.head.appendChild(style);
-    
-    setTimeout(() => {
-      window.print();
-      
-      // Cleanup - restore original visibility state
-      document.head.removeChild(style);
-      if (originalPage && currentPage !== "original") {
-        originalPage.style.display = 'none';
+    document.head.appendChild(inlinePrintStyles);
+    cleanupCallbacks.push(() => {
+      if (inlinePrintStyles.parentNode) {
+        inlinePrintStyles.parentNode.removeChild(inlinePrintStyles);
       }
-      if (duplicatePage && currentPage !== "duplicate") {
-        duplicatePage.style.display = 'none';
+    });
+
+    const cleanup = () => {
+      if (cleanedUp) {
+        return;
       }
-    }, 100);
+      cleanedUp = true;
+
+      body.classList.remove("exporting-pdf");
+      cleanupCallbacks.forEach((fn) => fn());
+      setIsGeneratingPdf(false);
+    };
+
+    const afterPrintHandler = () => {
+      cleanup();
+    };
+
+    window.addEventListener("afterprint", afterPrintHandler);
+    cleanupCallbacks.push(() => window.removeEventListener("afterprint", afterPrintHandler));
+
+    const mediaQueryList = typeof window.matchMedia === "function" ? window.matchMedia("print") : null;
+    if (mediaQueryList) {
+      const mediaQueryChangeHandler = (event: MediaQueryListEvent) => {
+        if (!event.matches) {
+          cleanup();
+        }
+      };
+
+      if (typeof mediaQueryList.addEventListener === "function") {
+        mediaQueryList.addEventListener("change", mediaQueryChangeHandler);
+        cleanupCallbacks.push(() => mediaQueryList.removeEventListener("change", mediaQueryChangeHandler));
+      } else if (typeof mediaQueryList.addListener === "function") {
+        mediaQueryList.addListener(mediaQueryChangeHandler);
+        cleanupCallbacks.push(() => mediaQueryList.removeListener(mediaQueryChangeHandler));
+      }
+    }
+
+    const fallbackTimer = window.setTimeout(() => {
+      cleanup();
+    }, 8000);
+    cleanupCallbacks.push(() => window.clearTimeout(fallbackTimer));
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        window.print();
+      });
+    });
   };
 
   const handleNewInvoice = () => {
@@ -173,9 +230,9 @@ const InvoicePreview = () => {
           <h1 className="text-xl font-bold text-center flex-1">
             Invoice Preview - {currentPage.toUpperCase()}
           </h1>
-          <Button onClick={handleDownloadPDF} className="gap-2">
+          <Button onClick={handleDownloadPDF} className="gap-2" disabled={isGeneratingPdf} aria-busy={isGeneratingPdf}>
             <Download className="h-4 w-4" />
-            Download PDF
+            {isGeneratingPdf ? "Preparing PDF" : "Download PDF"}
           </Button>
         </div>
       </div>
