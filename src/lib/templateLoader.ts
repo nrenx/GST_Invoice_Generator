@@ -3,7 +3,9 @@ import { InvoiceData } from "@/types/invoice";
 export type TemplateType = "standard" | "modern" | "professional";
 
 export const loadTemplate = async (templateType: TemplateType): Promise<string> => {
-  const templatePath = `/templates/invoices/${templateType}-template.html`;
+  const basePath = import.meta.env.BASE_URL ?? "/";
+  const normalizedBase = basePath.endsWith("/") ? basePath : `${basePath}/`;
+  const templatePath = `${normalizedBase}templates/invoices/${templateType}-template.html`;
   const response = await fetch(templatePath);
   if (!response.ok) {
     throw new Error(`Failed to load template: ${templateType}`);
