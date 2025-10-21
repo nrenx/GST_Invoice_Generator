@@ -1,6 +1,6 @@
 import { InvoiceData } from "@/types/invoice";
 
-export type TemplateType = "standard" | "modern";
+export type TemplateType = "standard" | "modern" | "professional";
 
 export const loadTemplate = async (templateType: TemplateType): Promise<string> => {
   const templatePath = `/templates/invoices/${templateType}-template.html`;
@@ -40,6 +40,8 @@ export const injectDataIntoTemplate = (
   const totalIGST = invoiceData.items.reduce((sum, item) => sum + item.igstAmount, 0);
   const totalTax = totalCGST + totalSGST + totalIGST;
   const grandTotal = totalTaxableValue + totalTax;
+  const totalQuantity = invoiceData.items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalAmount = invoiceData.items.reduce((sum, item) => sum + item.taxableValue, 0);
   const amountInWords = numberToWords(Math.floor(grandTotal)) + ' Rupees Only';
 
   // Build tax headers
@@ -87,25 +89,41 @@ export const injectDataIntoTemplate = (
     .replace(/{{COMPANY_NAME}}/g, invoiceData.companyName)
     .replace(/{{COMPANY_ADDRESS}}/g, invoiceData.companyAddress)
     .replace(/{{COMPANY_STATE}}/g, invoiceData.companyState)
+    .replace(/{{COMPANY_STATE_CODE}}/g, invoiceData.companyStateCode)
     .replace(/{{COMPANY_GSTIN}}/g, invoiceData.companyGSTIN)
     .replace(/{{COMPANY_EMAIL}}/g, invoiceData.companyEmail)
     .replace(/{{COMPANY_PHONE}}/g, invoiceData.companyPhone)
     .replace(/{{INVOICE_NUMBER}}/g, invoiceData.invoiceNumber)
     .replace(/{{INVOICE_DATE}}/g, invoiceData.invoiceDate)
+    .replace(/{{INVOICE_TYPE}}/g, invoiceData.invoiceType)
+    .replace(/{{SALE_TYPE}}/g, invoiceData.saleType)
+    .replace(/{{REVERSE_CHARGE}}/g, invoiceData.reverseCharge)
     .replace(/{{TRANSPORT_MODE}}/g, invoiceData.transportMode)
     .replace(/{{VEHICLE_NUMBER}}/g, invoiceData.vehicleNumber)
+    .replace(/{{TRANSPORTER_NAME}}/g, invoiceData.transporterName)
+    .replace(/{{DATE_OF_SUPPLY}}/g, invoiceData.dateOfSupply)
+    .replace(/{{PLACE_OF_SUPPLY}}/g, invoiceData.placeOfSupply)
+    .replace(/{{EWAY_BILL_NUMBER}}/g, invoiceData.eWayBillNumber)
     .replace(/{{RECEIVER_NAME}}/g, invoiceData.receiverName)
     .replace(/{{RECEIVER_ADDRESS}}/g, invoiceData.receiverAddress)
     .replace(/{{RECEIVER_STATE}}/g, invoiceData.receiverState)
+    .replace(/{{RECEIVER_STATE_CODE}}/g, invoiceData.receiverStateCode)
     .replace(/{{RECEIVER_GSTIN}}/g, invoiceData.receiverGSTIN)
     .replace(/{{CONSIGNEE_NAME}}/g, invoiceData.consigneeName)
     .replace(/{{CONSIGNEE_ADDRESS}}/g, invoiceData.consigneeAddress)
     .replace(/{{CONSIGNEE_STATE}}/g, invoiceData.consigneeState)
+    .replace(/{{CONSIGNEE_STATE_CODE}}/g, invoiceData.consigneeStateCode)
     .replace(/{{CONSIGNEE_GSTIN}}/g, invoiceData.consigneeGSTIN)
     .replace(/{{TAX_HEADERS}}/g, taxHeaders)
     .replace(/{{ITEMS_ROWS}}/g, itemsRows)
     .replace(/{{TAX_TOTALS}}/g, taxTotals)
+    .replace(/{{TOTAL_QUANTITY}}/g, totalQuantity.toFixed(2))
+    .replace(/{{TOTAL_AMOUNT}}/g, totalAmount.toFixed(2))
     .replace(/{{TOTAL_TAXABLE_VALUE}}/g, totalTaxableValue.toFixed(2))
+    .replace(/{{TOTAL_CGST}}/g, totalCGST.toFixed(2))
+    .replace(/{{TOTAL_SGST}}/g, totalSGST.toFixed(2))
+    .replace(/{{TOTAL_IGST}}/g, totalIGST.toFixed(2))
+    .replace(/{{TOTAL_TAX}}/g, totalTax.toFixed(2))
     .replace(/{{GRAND_TOTAL}}/g, grandTotal.toFixed(2))
     .replace(/{{AMOUNT_IN_WORDS}}/g, amountInWords)
     .replace(/{{TERMS_AND_CONDITIONS}}/g, invoiceData.termsAndConditions);

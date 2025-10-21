@@ -1,23 +1,23 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { FileText, Sparkles } from "lucide-react";
+import { FileText, Sparkles, Briefcase } from "lucide-react";
 
 interface TemplateSelectorProps {
   open: boolean;
   onClose: () => void;
-  onSelectTemplate: (template: "standard" | "modern") => void;
+  onSelectTemplate: (template: "standard" | "modern" | "professional") => void;
 }
 
 export const TemplateSelector = ({ open, onClose, onSelectTemplate }: TemplateSelectorProps) => {
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">Choose Invoice Template</DialogTitle>
         </DialogHeader>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
           <Card 
             className="cursor-pointer hover:shadow-lg transition-shadow p-6 border-2 hover:border-accent"
             onClick={() => onSelectTemplate("standard")}
@@ -47,6 +47,22 @@ export const TemplateSelector = ({ open, onClose, onSelectTemplate }: TemplateSe
                 Clean, contemporary design with enhanced visual appeal
               </p>
               <Button variant="secondary" className="w-full">Select</Button>
+            </div>
+          </Card>
+
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-shadow p-6 border-2 hover:border-accent"
+            onClick={() => onSelectTemplate("professional")}
+          >
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Briefcase className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold">Professional Template</h3>
+              <p className="text-sm text-muted-foreground text-center">
+                Pixel-perfect GST invoice with detailed tax sections and yellow highlights
+              </p>
+              <Button variant="outline" className="w-full">Select</Button>
             </div>
           </Card>
         </div>
