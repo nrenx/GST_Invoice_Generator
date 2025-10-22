@@ -51,17 +51,17 @@
       background: #1f4f88;
       color: #fff;
       text-align: center;
-      padding: 18px 0 14px;
+      padding: 12px 0 10px;
       border: 2px solid #000;
       border-top: none;
       border-bottom: 2px solid #000;
     }
 
     .company-name {
-      font-size: 34px;
+      font-size: 32px;
       font-weight: 700;
       letter-spacing: 3px;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .company-details {
@@ -253,6 +253,10 @@
 
     .items-table .text-center {
       text-align: center;
+    }
+
+    .blank-item-row td {
+      height: 20px;
     }
 
     .tax-header-group {
@@ -612,6 +616,23 @@
       </thead>
       <tbody>
         {{ITEMS_ROWS}}
+        <tr class="blank-item-row">
+          <td class="text-center">&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
         <tr class="total-row">
           <td colspan="3" class="text-center"><strong style="font-size: 12px;">Total</strong></td>
           <td class="text-right"><strong>{{TOTAL_QUANTITY}}</strong></td>
