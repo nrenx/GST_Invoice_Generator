@@ -46,15 +46,46 @@ const InvoicePreview = () => {
       return;
     }
 
+    if (!originalHTML || !duplicateHTML) {
+      toast.error("Invoice content is still loading. Please try again in a moment.");
+      return;
+    }
+
     setIsGeneratingPdf(true);
 
     try {
-      // Combine both pages for PDF
-      const combinedHTML = `
-        ${originalHTML}
-        <div style="page-break-before: always;"></div>
-        ${duplicateHTML}
-      `;
+      const buildCombinedHTML = (original: string, duplicate: string) => {
+        const extractSections = (html: string) => {
+          const headMatch = html.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
+          const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+          return {
+            head: headMatch ? headMatch[1] : "",
+            body: bodyMatch ? bodyMatch[1] : html
+          };
+        };
+
+        const originalSections = extractSections(original);
+        const duplicateSections = extractSections(duplicate);
+
+        return `<!DOCTYPE html>
+<html>
+<head>
+${originalSections.head}
+<style>
+  .page:last-of-type {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+</style>
+</head>
+<body>
+${originalSections.body}
+${duplicateSections.body}
+</body>
+</html>`;
+      };
+
+      const combinedHTML = buildCombinedHTML(originalHTML, duplicateHTML);
 
       // Generate filename
       const date = new Date().toISOString().split('T')[0];
