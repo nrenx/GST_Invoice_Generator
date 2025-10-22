@@ -27,38 +27,41 @@
     .page {
       width: 210mm;
       min-height: 297mm;
-      padding: 10mm;
+      padding: 6mm;
       margin: 0 auto;
-      background: white;
+      background: #fff;
       position: relative;
+      border: 2px solid #000;
     }
 
     .header-bar {
-      background: #3d5c6b;
-      color: white;
+      background: #1f4f88;
+      color: #fff;
       text-align: center;
       padding: 4px 0;
       font-size: 12px;
       font-weight: bold;
+      letter-spacing: 1px;
       border: 2px solid #000;
       border-bottom: none;
+      text-transform: uppercase;
     }
 
     .company-header {
-      background: #3d5c6b;
-      color: white;
+      background: #1f4f88;
+      color: #fff;
       text-align: center;
-      padding: 15px 0;
+      padding: 18px 0 14px;
       border: 2px solid #000;
       border-top: none;
       border-bottom: 2px solid #000;
     }
 
     .company-name {
-      font-size: 36px;
-      font-weight: bold;
-      letter-spacing: 2px;
-      margin-bottom: 5px;
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      margin-bottom: 6px;
     }
 
     .company-details {
@@ -79,63 +82,64 @@
       width: 100%;
       border: 2px solid #000;
       border-top: none;
+      background: #f5f5f5;
     }
 
     .invoice-title-left {
       display: table-cell;
       width: 60%;
-      padding: 8px;
-      font-size: 16px;
+      padding: 10px;
+      font-size: 18px;
       font-weight: bold;
       border-right: 2px solid #000;
+      letter-spacing: 1px;
+      text-align: center;
     }
 
     .invoice-title-right {
       display: table-cell;
       width: 40%;
-      padding: 4px 8px;
+      padding: 6px 10px;
       font-size: 9px;
-      text-align: right;
+      text-align: left;
+      line-height: 1.3;
     }
 
     .invoice-title-right div {
-      margin: 1px 0;
+      margin: 2px 0;
     }
 
-    .metadata-grid {
-      display: table;
+    .metadata-table {
       width: 100%;
       border: 2px solid #000;
       border-top: none;
-    }
-
-    .metadata-row {
-      display: table-row;
-    }
-
-    .metadata-cell {
-      display: table-cell;
-      border-right: 2px solid #000;
-      border-bottom: 2px solid #000;
-      padding: 5px 8px;
+      border-collapse: collapse;
+      table-layout: fixed;
       font-size: 10px;
     }
 
-    .metadata-cell:last-child {
-      border-right: none;
+    .metadata-table td {
+      border: 1px solid #000;
+      padding: 5px 8px;
+      vertical-align: middle;
+      white-space: normal;
+      word-break: break-word;
+      overflow-wrap: anywhere;
     }
 
-    .metadata-row:last-child .metadata-cell {
-      border-bottom: none;
-    }
-
-    .metadata-label {
+    .metadata-label-cell {
       font-weight: bold;
-      width: 100px;
+      width: 12%;
     }
 
-    .metadata-value {
-      padding-left: 5px;
+    .metadata-value-cell {
+      width: 13%;
+      padding-left: 6px;
+    }
+
+    .metadata-highlight {
+      color: #d32f2f;
+      font-weight: bold;
     }
 
     .red-text {
@@ -143,55 +147,66 @@
       font-weight: bold;
     }
 
-    .section-header {
+    .party-table {
+      width: 100%;
+      border: 2px solid #000;
+      border-top: none;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .party-table th {
       background: #f5f5f5;
       font-weight: bold;
       text-align: center;
       padding: 6px;
-      border: 2px solid #000;
-      border-top: none;
-      font-size: 12px;
+      border: 1px solid #000;
+      font-size: 11px;
     }
 
-    .party-details {
-      display: table;
-      width: 100%;
-      border: 2px solid #000;
-      border-top: none;
+    .party-table th + th {
+      border-left-width: 2px;
     }
 
-    .party-column {
-      display: table-cell;
-      width: 50%;
-      border-right: 2px solid #000;
-      padding: 8px;
+    .party-table td {
+      border: 1px solid #000;
       vertical-align: top;
+      padding: 0;
     }
 
-    .party-column:last-child {
-      border-right: none;
+    .party-table td + td {
+      border-left-width: 2px;
     }
 
-    .party-row {
-      display: flex;
+    .party-info-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10px;
+    }
+
+    .party-info-table th,
+    .party-info-table td {
       border-bottom: 1px solid #000;
-      min-height: 22px;
+      padding: 4px 6px;
+      text-align: left;
+      white-space: normal;
+      word-break: break-word;
+      overflow-wrap: anywhere;
     }
 
-    .party-row:last-child {
-      border-bottom: none;
-    }
-
-    .party-label {
+    .party-info-table th {
+      width: 38%;
       font-weight: bold;
-      width: 90px;
-      padding: 4px;
       border-right: 1px solid #000;
     }
 
-    .party-value {
-      flex: 1;
-      padding: 4px;
+    .party-info-table td {
+      border-right: none;
+    }
+
+    .party-info-table tr:last-child th,
+    .party-info-table tr:last-child td {
+      border-bottom: none;
     }
 
     .items-table {
@@ -200,6 +215,7 @@
       border: 2px solid #000;
       border-top: none;
       font-size: 9px;
+      table-layout: fixed;
     }
 
     .items-table th {
@@ -209,12 +225,16 @@
       font-weight: bold;
       text-align: center;
       font-size: 9px;
+      white-space: nowrap;
     }
 
     .items-table td {
       border: 1px solid #000;
       padding: 5px 4px;
       text-align: left;
+      white-space: normal;
+      word-break: break-word;
+      overflow-wrap: anywhere;
     }
 
     .items-table .text-right {
@@ -236,42 +256,47 @@
     }
 
     .total-row {
-      background: #e8e8e8;
+      background: #e5e5e5;
       font-weight: bold;
     }
 
     .yellow-highlight {
-      background: #ffeb3b;
+      background: #ffea2d;
       font-weight: bold;
       padding: 6px 8px;
+      text-transform: uppercase;
     }
 
-    .summary-section {
-      display: table;
+    .summary-table {
       width: 100%;
       border: 2px solid #000;
       border-top: none;
+      border-collapse: collapse;
+      table-layout: fixed;
     }
 
-    .summary-left {
-      display: table-cell;
+    .summary-table td {
+      border: 1px solid #000;
+      vertical-align: top;
+      padding: 0;
+    }
+
+    .summary-left-cell {
       width: 60%;
       border-right: 2px solid #000;
-      vertical-align: top;
     }
 
-    .summary-right {
-      display: table-cell;
+    .summary-right-cell {
       width: 40%;
-      vertical-align: top;
     }
 
     .amount-words-section {
-      background: #ffeb3b;
+      background: #ffea2d;
       font-weight: bold;
       padding: 6px 8px;
       border-bottom: 2px solid #000;
       font-size: 11px;
+      text-transform: uppercase;
     }
 
     .amount-words-value {
@@ -282,21 +307,23 @@
     }
 
     .terms-section {
-      background: #ffeb3b;
+      background: #ffea2d;
       font-weight: bold;
       padding: 6px 8px;
       border-bottom: 2px solid #000;
       font-size: 11px;
+      text-transform: uppercase;
     }
 
     .terms-content {
-      padding: 6px 8px;
+      padding: 6px 8px 10px;
       font-size: 9px;
       line-height: 1.4;
+      min-height: 100px;
     }
 
     .terms-content ol {
-      margin-left: 15px;
+      margin-left: 18px;
       margin-top: 4px;
     }
 
@@ -304,41 +331,42 @@
       margin: 2px 0;
     }
 
-    .tax-summary-row {
-      display: flex;
-      border-bottom: 1px solid #000;
+    .tax-summary-table {
+      width: 100%;
+      border-collapse: collapse;
       font-size: 10px;
     }
 
-    .tax-summary-row:last-child {
+    .tax-summary-table td {
+      border-bottom: 1px solid #000;
+      padding: 6px 8px;
+      white-space: normal;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .tax-summary-table td:first-child {
+      font-weight: bold;
+      border-right: 1px solid #000;
+    }
+
+    .tax-summary-table td:last-child {
+      text-align: right;
+      width: 40%;
+    }
+
+    .tax-summary-table tr:last-child td {
       border-bottom: none;
     }
 
-    .tax-label {
-      width: 60%;
-      padding: 5px 8px;
-      border-right: 1px solid #000;
-      font-weight: bold;
-    }
-
-    .tax-value {
-      width: 40%;
-      padding: 5px 8px;
-      text-align: right;
-    }
-
-    .grand-total-row {
-      background: #ffeb3b;
-    }
-
-    .grand-total-row .tax-label,
-    .grand-total-row .tax-value {
+    .tax-summary-table .grand-total-row td {
+      background: #ffea2d;
       font-weight: bold;
       font-size: 11px;
     }
 
     .certification-text {
-      padding: 6px 8px;
+      padding: 8px;
       border-top: 2px solid #000;
       border-bottom: 2px solid #000;
       text-align: center;
@@ -346,44 +374,49 @@
       font-weight: bold;
     }
 
-    .signature-section {
-      display: table;
+    .signature-table {
       width: 100%;
       border: 2px solid #000;
       border-top: none;
-      min-height: 120px;
+      border-collapse: collapse;
+      table-layout: fixed;
     }
 
-    .signature-column {
-      display: table-cell;
-      width: 33.33%;
-      border-right: 2px solid #000;
-      vertical-align: top;
+    .signature-table td {
+      border: 1px solid #000;
       padding: 8px;
+      vertical-align: top;
     }
 
-    .signature-column:last-child {
-      border-right: none;
+    .signature-table td + td {
+      border-left-width: 2px;
+    }
+
+    .signature-block {
+      display: flex;
+      flex-direction: column;
+      min-height: 120px;
     }
 
     .signature-label {
       font-size: 9px;
-      margin-bottom: 3px;
+      margin-bottom: 4px;
+      text-align: left;
     }
 
     .signature-space {
-      min-height: 80px;
+      flex: 1;
       display: flex;
       align-items: flex-end;
       justify-content: center;
+      margin-bottom: 6px;
     }
 
     .signature-footer {
       text-align: center;
       font-weight: bold;
-      padding-top: 8px;
+      padding-top: 6px;
       border-top: 1px solid #000;
-      margin-top: 8px;
       font-size: 10px;
     }
 
@@ -428,168 +461,116 @@
     </div>
 
     <!-- Metadata Grid -->
-    <div class="metadata-grid">
-      <div class="metadata-row">
-        <div class="metadata-cell" style="width: 15%;">
-          <span class="metadata-label">Invoice No.</span>
-        </div>
-        <div class="metadata-cell" style="width: 18%; color: #d32f2f; font-weight: bold;">
-          {{INVOICE_NUMBER}}
-        </div>
-        <div class="metadata-cell" style="width: 18%;">
-          <span class="metadata-label">Transport Mode</span>
-        </div>
-        <div class="metadata-cell" style="width: 16%;">
-          {{TRANSPORT_MODE}}
-        </div>
-        <div class="metadata-cell" style="width: 15%;">
-          <span class="metadata-label">Challan No.</span>
-        </div>
-        <div class="metadata-cell" style="width: 3%;">
-          {{CHALLAN_NUMBER}}
-        </div>
-        <div class="metadata-cell" style="width: 15%;">
-          <span class="metadata-label">Sale Type</span>
-        </div>
-        <div class="metadata-cell" style="width: 18%; border-right: 2px solid #000;">
-          <span class="red-text">{{SALE_TYPE}}</span>
-        </div>
-      </div>
-      
-      <div class="metadata-row">
-        <div class="metadata-cell" style="width: 15%;">
-          <span class="metadata-label">Invoice Date</span>
-        </div>
-        <div class="metadata-cell" style="width: 18%;">
-          {{INVOICE_DATE}}
-        </div>
-        <div class="metadata-cell" style="width: 18%;">
-          <span class="metadata-label">Vehicle Number</span>
-        </div>
-        <div class="metadata-cell" style="width: 16%;">
-          {{VEHICLE_NUMBER}}
-        </div>
-        <div class="metadata-cell" style="width: 15%;">
-          <span class="metadata-label">Transporter Name</span>
-        </div>
-        <div class="metadata-cell" style="width: 3%;">
-          {{TRANSPORTER_NAME}}
-        </div>
-        <div class="metadata-cell" style="width: 15%;">
-          <span class="metadata-label">Invoice Type</span>
-        </div>
-        <div class="metadata-cell" style="width: 18%; border-right: 2px solid #000;">
-          {{INVOICE_TYPE}}
-        </div>
-      </div>
-
-      <div class="metadata-row">
-        <div class="metadata-cell" style="width: 15%;">
-          <span class="metadata-label">State</span>
-        </div>
-        <div class="metadata-cell" style="width: 18%;">
-          {{COMPANY_STATE}}
-        </div>
-        <div class="metadata-cell" style="width: 18%;">
-          <span class="metadata-label">Date of Supply</span>
-        </div>
-        <div class="metadata-cell" style="width: 16%;">
-          {{DATE_OF_SUPPLY}}
-        </div>
-        <div class="metadata-cell" style="width: 15%;">
-          <span class="metadata-label">L.R Number</span>
-        </div>
-        <div class="metadata-cell" style="width: 3%;">
-          {{LR_NUMBER}}
-        </div>
-        <div class="metadata-cell" style="width: 15%;">
-          <span class="metadata-label">Reverse Charge</span>
-        </div>
-        <div class="metadata-cell" style="width: 18%; border-right: 2px solid #000;">
-          {{REVERSE_CHARGE}}
-        </div>
-      </div>
-
-      <div class="metadata-row">
-        <div class="metadata-cell" style="width: 15%;">
-          <span class="metadata-label">State Code</span>
-        </div>
-        <div class="metadata-cell" style="width: 18%;">
-          {{COMPANY_STATE_CODE}}
-        </div>
-        <div class="metadata-cell" style="width: 18%;">
-          <span class="metadata-label">Place of Supply</span>
-        </div>
-        <div class="metadata-cell" style="width: 16%;">
-          {{PLACE_OF_SUPPLY}}
-        </div>
-        <div class="metadata-cell" style="width: 15%;">
-          <span class="metadata-label">P.O Number</span>
-        </div>
-        <div class="metadata-cell" style="width: 3%;">
-          {{PO_NUMBER}}
-        </div>
-        <div class="metadata-cell" style="width: 15%;">
-          <span class="metadata-label">E-Way Bill No.</span>
-        </div>
-        <div class="metadata-cell" style="width: 18%; border-right: 2px solid #000;">
-          {{EWAY_BILL_NUMBER}}
-        </div>
-      </div>
-    </div>
+    <table class="metadata-table">
+      <tbody>
+        <tr>
+          <td class="metadata-label-cell">Invoice No.</td>
+          <td class="metadata-value-cell metadata-highlight">{{INVOICE_NUMBER}}</td>
+          <td class="metadata-label-cell">Transport Mode</td>
+          <td class="metadata-value-cell">{{TRANSPORT_MODE}}</td>
+          <td class="metadata-label-cell">Challan No.</td>
+          <td class="metadata-value-cell">{{CHALLAN_NUMBER}}</td>
+          <td class="metadata-label-cell">Sale Type</td>
+          <td class="metadata-value-cell"><span class="red-text">{{SALE_TYPE}}</span></td>
+        </tr>
+        <tr>
+          <td class="metadata-label-cell">Invoice Date</td>
+          <td class="metadata-value-cell">{{INVOICE_DATE}}</td>
+          <td class="metadata-label-cell">Vehicle Number</td>
+          <td class="metadata-value-cell">{{VEHICLE_NUMBER}}</td>
+          <td class="metadata-label-cell">Transporter Name</td>
+          <td class="metadata-value-cell">{{TRANSPORTER_NAME}}</td>
+          <td class="metadata-label-cell">Invoice Type</td>
+          <td class="metadata-value-cell">{{INVOICE_TYPE}}</td>
+        </tr>
+        <tr>
+          <td class="metadata-label-cell">State</td>
+          <td class="metadata-value-cell">{{COMPANY_STATE}}</td>
+          <td class="metadata-label-cell">Date of Supply</td>
+          <td class="metadata-value-cell">{{DATE_OF_SUPPLY}}</td>
+          <td class="metadata-label-cell">L.R Number</td>
+          <td class="metadata-value-cell">{{LR_NUMBER}}</td>
+          <td class="metadata-label-cell">Reverse Charge</td>
+          <td class="metadata-value-cell">{{REVERSE_CHARGE}}</td>
+        </tr>
+        <tr>
+          <td class="metadata-label-cell">State Code</td>
+          <td class="metadata-value-cell">{{COMPANY_STATE_CODE}}</td>
+          <td class="metadata-label-cell">Place of Supply</td>
+          <td class="metadata-value-cell">{{PLACE_OF_SUPPLY}}</td>
+          <td class="metadata-label-cell">P.O Number</td>
+          <td class="metadata-value-cell">{{PO_NUMBER}}</td>
+          <td class="metadata-label-cell">E-Way Bill No.</td>
+          <td class="metadata-value-cell">{{EWAY_BILL_NUMBER}}</td>
+        </tr>
+      </tbody>
+    </table>
 
     <!-- Party Details Section -->
-    <div class="section-header">
-      <span style="display: inline-block; width: 49%; text-align: center;">Details of Receiver (Billed to)</span>
-      <span style="display: inline-block; width: 49%; text-align: center; border-left: 2px solid #000; margin-left: -2px;">Details of Consignee (Shipped to)</span>
-    </div>
-
-    <div class="party-details">
-      <div class="party-column">
-        <div class="party-row">
-          <div class="party-label">Name:</div>
-          <div class="party-value">{{RECEIVER_NAME}}</div>
-        </div>
-        <div class="party-row">
-          <div class="party-label">Address:</div>
-          <div class="party-value">{{RECEIVER_ADDRESS}}</div>
-        </div>
-        <div class="party-row">
-          <div class="party-label">GSTIN:</div>
-          <div class="party-value">{{RECEIVER_GSTIN}}</div>
-        </div>
-        <div class="party-row">
-          <div class="party-label">State:</div>
-          <div class="party-value">{{RECEIVER_STATE}}</div>
-        </div>
-        <div class="party-row">
-          <div class="party-label">State Code:</div>
-          <div class="party-value">{{RECEIVER_STATE_CODE}}</div>
-        </div>
-      </div>
-      <div class="party-column">
-        <div class="party-row">
-          <div class="party-label">Name:</div>
-          <div class="party-value">{{CONSIGNEE_NAME}}</div>
-        </div>
-        <div class="party-row">
-          <div class="party-label">Address:</div>
-          <div class="party-value">{{CONSIGNEE_ADDRESS}}</div>
-        </div>
-        <div class="party-row">
-          <div class="party-label">GSTIN:</div>
-          <div class="party-value">{{CONSIGNEE_GSTIN}}</div>
-        </div>
-        <div class="party-row">
-          <div class="party-label">State:</div>
-          <div class="party-value">{{CONSIGNEE_STATE}}</div>
-        </div>
-        <div class="party-row">
-          <div class="party-label">State Code:</div>
-          <div class="party-value">{{CONSIGNEE_STATE_CODE}}</div>
-        </div>
-      </div>
-    </div>
+    <table class="party-table">
+      <thead>
+        <tr>
+          <th>Details of Receiver (Billed to)</th>
+          <th>Details of Consignee (Shipped to)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <table class="party-info-table">
+              <tbody>
+                <tr>
+                  <th>Name:</th>
+                  <td>{{RECEIVER_NAME}}</td>
+                </tr>
+                <tr>
+                  <th>Address:</th>
+                  <td>{{RECEIVER_ADDRESS}}</td>
+                </tr>
+                <tr>
+                  <th>GSTIN:</th>
+                  <td>{{RECEIVER_GSTIN}}</td>
+                </tr>
+                <tr>
+                  <th>State:</th>
+                  <td>{{RECEIVER_STATE}}</td>
+                </tr>
+                <tr>
+                  <th>State Code:</th>
+                  <td>{{RECEIVER_STATE_CODE}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+          <td>
+            <table class="party-info-table">
+              <tbody>
+                <tr>
+                  <th>Name:</th>
+                  <td>{{CONSIGNEE_NAME}}</td>
+                </tr>
+                <tr>
+                  <th>Address:</th>
+                  <td>{{CONSIGNEE_ADDRESS}}</td>
+                </tr>
+                <tr>
+                  <th>GSTIN:</th>
+                  <td>{{CONSIGNEE_GSTIN}}</td>
+                </tr>
+                <tr>
+                  <th>State:</th>
+                  <td>{{CONSIGNEE_STATE}}</td>
+                </tr>
+                <tr>
+                  <th>State Code:</th>
+                  <td>{{CONSIGNEE_STATE_CODE}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
     <!-- Items Table -->
     <table class="items-table">
@@ -638,68 +619,86 @@
     </table>
 
     <!-- Summary Section -->
-    <div class="summary-section">
-      <div class="summary-left">
-        <div class="amount-words-section">Total Invoice Amount in Words</div>
-        <div class="amount-words-value">{{AMOUNT_IN_WORDS}}</div>
-        <div class="terms-section">Terms and Conditions</div>
-        <div class="terms-content">
-          {{TERMS_AND_CONDITIONS}}
-        </div>
-      </div>
-      <div class="summary-right">
-        <div class="tax-summary-row">
-          <div class="tax-label">Total Amount Before Tax:</div>
-          <div class="tax-value">{{TOTAL_TAXABLE_VALUE}}</div>
-        </div>
-        <div class="tax-summary-row">
-          <div class="tax-label">CGST :</div>
-          <div class="tax-value">{{TOTAL_CGST}}</div>
-        </div>
-        <div class="tax-summary-row">
-          <div class="tax-label">SGST :</div>
-          <div class="tax-value">{{TOTAL_SGST}}</div>
-        </div>
-        <div class="tax-summary-row">
-          <div class="tax-label">IGST :</div>
-          <div class="tax-value">{{TOTAL_IGST}}</div>
-        </div>
-        <div class="tax-summary-row">
-          <div class="tax-label">CESS :</div>
-          <div class="tax-value">0.00</div>
-        </div>
-        <div class="tax-summary-row">
-          <div class="tax-label">Total Tax:</div>
-          <div class="tax-value">{{TOTAL_TAX}}</div>
-        </div>
-        <div class="tax-summary-row grand-total-row">
-          <div class="tax-label">Total Amount After Tax:</div>
-          <div class="tax-value">{{GRAND_TOTAL}}</div>
-        </div>
-        <div class="certification-text">
-          Certified that the particulars given above are true and correct
-        </div>
-      </div>
-    </div>
+    <table class="summary-table">
+      <tbody>
+        <tr>
+          <td class="summary-left-cell">
+            <div class="amount-words-section">Total Invoice Amount in Words</div>
+            <div class="amount-words-value">{{AMOUNT_IN_WORDS}}</div>
+            <div class="terms-section">Terms and Conditions</div>
+            <div class="terms-content">
+              {{TERMS_AND_CONDITIONS}}
+            </div>
+          </td>
+          <td class="summary-right-cell">
+            <table class="tax-summary-table">
+              <tbody>
+                <tr>
+                  <td>Total Amount Before Tax:</td>
+                  <td>{{TOTAL_TAXABLE_VALUE}}</td>
+                </tr>
+                <tr>
+                  <td>CGST :</td>
+                  <td>{{TOTAL_CGST}}</td>
+                </tr>
+                <tr>
+                  <td>SGST :</td>
+                  <td>{{TOTAL_SGST}}</td>
+                </tr>
+                <tr>
+                  <td>IGST :</td>
+                  <td>{{TOTAL_IGST}}</td>
+                </tr>
+                <tr>
+                  <td>CESS :</td>
+                  <td>0.00</td>
+                </tr>
+                <tr>
+                  <td>Total Tax:</td>
+                  <td>{{TOTAL_TAX}}</td>
+                </tr>
+                <tr class="grand-total-row">
+                  <td>Total Amount After Tax:</td>
+                  <td>{{GRAND_TOTAL}}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="certification-text">
+              Certified that the particulars given above are true and correct
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
     <!-- Signature Section -->
-    <div class="signature-section">
-      <div class="signature-column">
-        <div class="signature-label">Mobile No: _____________</div>
-        <div class="signature-space"></div>
-        <div class="signature-footer">Transporter's Signature</div>
-      </div>
-      <div class="signature-column">
-        <div class="signature-label">Mobile No: _____________</div>
-        <div class="signature-space"></div>
-        <div class="signature-footer">Receiver's Signature</div>
-      </div>
-      <div class="signature-column">
-        <div class="signature-label">Mobile No: _____________</div>
-        <div class="signature-space"></div>
-        <div class="signature-footer">Authorized Signatory</div>
-      </div>
-    </div>
+    <table class="signature-table">
+      <tbody>
+        <tr>
+          <td>
+            <div class="signature-block">
+              <div class="signature-label">Mobile No: _____________</div>
+              <div class="signature-space"></div>
+              <div class="signature-footer">Transporter's Signature</div>
+            </div>
+          </td>
+          <td>
+            <div class="signature-block">
+              <div class="signature-label">Mobile No: _____________</div>
+              <div class="signature-space"></div>
+              <div class="signature-footer">Receiver's Signature</div>
+            </div>
+          </td>
+          <td>
+            <div class="signature-block">
+              <div class="signature-label">Mobile No: _____________</div>
+              <div class="signature-space"></div>
+              <div class="signature-footer">Authorized Signatory</div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </body>
 </html>
