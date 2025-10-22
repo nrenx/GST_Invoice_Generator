@@ -65,16 +65,25 @@
     }
 
     .company-details {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
       background: white;
       border: 2px solid #000;
       border-top: none;
-      padding: 8px;
-      text-align: center;
+      padding: 12px 16px;
+      min-height: 80px;
     }
 
-    .company-details div {
-      margin: 3px 0;
-      font-size: 12px;
+    .company-info {
+      text-align: left;
+      flex: 1;
+    }
+
+    .company-info div {
+      margin: 4px 0;
+      font-size: 16px;
     }
 
     .company-details .detail-label {
@@ -83,6 +92,21 @@
 
     .company-details .detail-value {
       font-weight: 700;
+    }
+
+    .company-qr {
+      min-width: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .company-qr img {
+      width: 90px;
+      height: 90px;
+      border: 1px solid #000;
+      padding: 4px;
+      background: #fff;
     }
 
     .invoice-title-section {
@@ -461,9 +485,15 @@
 
     <!-- Company Details -->
     <div class="company-details">
-      <div><span class="detail-value">{{COMPANY_ADDRESS}}</span></div>
-      <div><span class="detail-label">GSTIN:</span> <span class="detail-value">{{COMPANY_GSTIN}}</span></div>
-      <div><span class="detail-label">Email:</span> <span class="detail-value">{{COMPANY_EMAIL}}</span></div>
+      <div class="company-info">
+        <div><span class="detail-value">{{COMPANY_ADDRESS}}</span></div>
+        <div><span class="detail-label">GSTIN:</span> <span class="detail-value">{{COMPANY_GSTIN}}</span></div>
+        <div><span class="detail-label">Email:</span> <span class="detail-value">{{COMPANY_EMAIL}}</span></div>
+      </div>
+      <div class="company-qr">
+        <img alt="Invoice QR"
+          src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=Invoice%20No.%3A%20{{INVOICE_NUMBER}}%0AInvoice%20Date%3A%20{{INVOICE_DATE}}%0AName%3A%20{{RECEIVER_NAME}}%0AGSTIN%3A%20{{RECEIVER_GSTIN}}%0AState%3A%20{{RECEIVER_STATE}}%0ASale%20Type%3A%20{{SALE_TYPE}}%0AE-Way%20Bill%20No.%3A%20{{EWAY_BILL_NUMBER}}%0AQuantity%3A%20{{TOTAL_QUANTITY}}%0ATotal%20Amount%20After%20Tax%3A%20{{GRAND_TOTAL}}" />
+      </div>
     </div>
 
     <!-- Invoice Title Section -->
