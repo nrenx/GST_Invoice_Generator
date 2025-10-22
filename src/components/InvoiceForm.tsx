@@ -233,8 +233,9 @@ const getDefaultValues = (profile: Profile): InvoiceFormData => {
       return {
         ...baseDefaults,
         ...parsedData,
-        invoiceDate: normalizeDateInput(parsedData?.invoiceDate, baseDefaults.invoiceDate),
-        dateOfSupply: normalizeDateInput(parsedData?.dateOfSupply, baseDefaults.dateOfSupply),
+        // Ensure every fresh load starts with today's dates even when cached data exists.
+        invoiceDate: baseDefaults.invoiceDate,
+        dateOfSupply: baseDefaults.dateOfSupply,
         receiverGSTIN: parsedData?.receiverGSTIN || baseDefaults.receiverGSTIN,
         consigneeGSTIN: parsedData?.consigneeGSTIN || baseDefaults.consigneeGSTIN,
         items: mergedItems,
