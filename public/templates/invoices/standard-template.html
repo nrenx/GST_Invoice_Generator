@@ -36,10 +36,13 @@
     }
 
     .header {
-      background: #1a365d;
+      background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
       color: white;
-      padding: 15px;
+      padding: 18px;
       margin-bottom: 15px;
+      border-radius: 4px;
+      position: relative;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     .header h1 {
@@ -54,15 +57,16 @@
     }
 
     .page-type {
-      text-align: right;
-      font-size: 9pt;
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 8pt;
       font-weight: bold;
       background: #f59e0b;
       color: white;
-      padding: 8px 12px;
-      display: inline-block;
-      float: right;
+      padding: 8px 14px;
       border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
     .invoice-details {

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antique Classic Invoice Template</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 210mm;
+      min-height: 297mm;
+      font-family: 'Garamond', 'Georgia', 'Times New Roman', serif;
+      font-size: 10pt;
+      line-height: 1.5;
+      color: #2c1810;
+      background: #faf8f3;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    .invoice-container {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 15mm;
+      background: #faf8f3;
+      border: 8px double #8b7355;
+      position: relative;
+    }
+
+    .ornamental-border {
+      position: absolute;
+      top: 5mm;
+      left: 5mm;
+      right: 5mm;
+      bottom: 5mm;
+      border: 2px solid #b8956a;
+      pointer-events: none;
+    }
+
+    .ornamental-corners::before,
+    .ornamental-corners::after {
+      content: '❦';
+      position: absolute;
+      font-size: 20pt;
+      color: #b8956a;
+    }
+
+    .ornamental-corners::before {
+      top: -15px;
+      left: -15px;
+    }
+
+    .ornamental-corners::after {
+      bottom: -15px;
+      right: -15px;
+    }
+
+    .content-wrapper {
+      position: relative;
+      z-index: 1;
+    }
+
+    .header-emblem {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 20px;
+      background: linear-gradient(to bottom, #e8dcc8 0%, #faf8f3 100%);
+      border: 3px solid #8b7355;
+      border-radius: 4px;
+      position: relative;
+    }
+
+    .header-emblem::before {
+      content: '◆';
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 18pt;
+      color: #b8956a;
+      background: #faf8f3;
+      padding: 0 10px;
+    }
+
+    .header-emblem h1 {
+      font-size: 28pt;
+      font-weight: normal;
+      color: #5a4a3a;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      font-variant: small-caps;
+    }
+
+    .header-emblem .subtitle {
+      font-size: 10pt;
+      color: #8b7355;
+      font-style: italic;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+
+    .header-emblem .company-info {
+      font-size: 9pt;
+      color: #5a4a3a;
+      line-height: 1.6;
+    }
+
+    .page-type-seal {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #8b7355;
+      color: #faf8f3;
+      padding: 10px 18px;
+      border-radius: 50%;
+      font-size: 7pt;
+      font-weight: bold;
+      text-align: center;
+      border: 3px double #b8956a;
+      line-height: 1.3;
+      max-width: 80px;
+    }
+
+    .divider-ornament {
+      text-align: center;
+      color: #b8956a;
+      font-size: 14pt;
+      margin: 15px 0;
+      letter-spacing: 20px;
+    }
+
+    .invoice-metadata {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .metadata-box {
+      background: #f5f0e8;
+      padding: 14px;
+      border: 2px solid #b8956a;
+      border-radius: 2px;
+    }
+
+    .metadata-box h3 {
+      font-size: 10pt;
+      font-weight: 600;
+      color: #5a4a3a;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #b8956a;
+      padding-bottom: 6px;
+      font-variant: small-caps;
+      letter-spacing: 1px;
+    }
+
+    .metadata-box p {
+      font-size: 9pt;
+      margin: 5px 0;
+      color: #2c1810;
+    }
+
+    .metadata-box strong {
+      color: #5a4a3a;
+      font-weight: 600;
+    }
+
+    .parties-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .party-box {
+      background: #faf8f3;
+      border: 2px solid #8b7355;
+      padding: 14px;
+      min-height: 140px;
+      position: relative;
+    }
+
+    .party-box::before {
+      content: '※';
+      position: absolute;
+      top: -10px;
+      left: 10px;
+      font-size: 16pt;
+      color: #b8956a;
+      background: #faf8f3;
+      padding: 0 8px;
+    }
+
+    .party-box h3 {
+      font-size: 10pt;
+      font-weight: 600;
+      color: #5a4a3a;
+      margin-bottom: 10px;
+      font-variant: small-caps;
+      letter-spacing: 1px;
+    }
+
+    .party-box p {
+      font-size: 9pt;
+      margin: 4px 0;
+      color: #2c1810;
+    }
+
+    .party-box p:first-of-type {
+      font-weight: 600;
+      font-size: 10pt;
+      color: #5a4a3a;
+    }
+
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-size: 9pt;
+      border: 3px solid #8b7355;
+    }
+
+    .items-table th {
+      background: linear-gradient(to bottom, #b8956a 0%, #8b7355 100%);
+      color: #faf8f3;
+      padding: 10px 8px;
+      text-align: left;
+      font-weight: 600;
+      border: 1px solid #5a4a3a;
+      font-variant: small-caps;
+      letter-spacing: 0.5px;
+    }
+
+    .items-table th.text-right {
+      text-align: right;
+    }
+
+    .items-table td {
+      padding: 9px 8px;
+      border: 1px solid #b8956a;
+      background: #faf8f3;
+    }
+
+    .items-table td.text-right {
+      text-align: right;
+    }
+
+    .items-table tbody tr:nth-child(even) td {
+      background: #f5f0e8;
+    }
+
+    .items-table tfoot td {
+      font-weight: 700;
+      background: #e8dcc8;
+      color: #5a4a3a;
+      padding: 12px 8px;
+      border: 2px solid #8b7355;
+    }
+
+    .total-row {
+      font-size: 11pt;
+      color: #5a4a3a;
+    }
+
+    .amount-words-section {
+      background: #f5f0e8;
+      border: 2px solid #b8956a;
+      padding: 14px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .amount-words-section::before {
+      content: '❦';
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 18pt;
+      color: #b8956a;
+      background: #faf8f3;
+      padding: 0 10px;
+    }
+
+    .amount-words-section p {
+      font-size: 9pt;
+      color: #2c1810;
+      text-align: center;
+    }
+
+    .amount-words-section strong {
+      font-weight: 600;
+      color: #5a4a3a;
+      font-variant: small-caps;
+      letter-spacing: 1px;
+    }
+
+    .footer-section {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 15px;
+    }
+
+    .terms-box {
+      border: 2px solid #8b7355;
+      padding: 14px;
+      background: #faf8f3;
+      min-height: 120px;
+    }
+
+    .terms-box h3 {
+      font-size: 10pt;
+      font-weight: 600;
+      color: #5a4a3a;
+      margin-bottom: 10px;
+      font-variant: small-caps;
+      letter-spacing: 1px;
+      border-bottom: 1px solid #b8956a;
+      padding-bottom: 6px;
+    }
+
+    .terms-box p {
+      font-size: 8pt;
+      white-space: pre-line;
+      color: #2c1810;
+      line-height: 1.6;
+    }
+
+    .signature-box {
+      border: 2px solid #8b7355;
+      padding: 14px;
+      text-align: center;
+      background: #f5f0e8;
+    }
+
+    .signature-box h3 {
+      font-size: 10pt;
+      font-weight: 600;
+      color: #5a4a3a;
+      margin-bottom: 15px;
+      font-variant: small-caps;
+      letter-spacing: 1px;
+    }
+
+    .signature-space {
+      margin: 45px auto 15px auto;
+      border-bottom: 2px solid #8b7355;
+      width: 70%;
+    }
+
+    .signature-box p {
+      font-size: 9pt;
+      color: #5a4a3a;
+      font-style: italic;
+    }
+
+    .closing-ornament {
+      text-align: center;
+      color: #b8956a;
+      font-size: 14pt;
+      margin-top: 20px;
+    }
+
+    @media print {
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      
+      .invoice-container {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="invoice-container">
+    <div class="ornamental-border ornamental-corners"></div>
+    
+    <div class="content-wrapper">
+      <!-- Page Type Seal -->
+      <div class="page-type-seal">
+        {{PAGE_TYPE}}<br>FOR<br>RECIPIENT
+      </div>
+
+      <!-- Header Emblem -->
+      <div class="header-emblem">
+        <h1>{{COMPANY_NAME}}</h1>
+        <div class="subtitle">Tax Invoice</div>
+        <div class="company-info">
+          {{COMPANY_ADDRESS}}<br>
+          {{COMPANY_STATE}}<br>
+          <strong>GSTIN:</strong> {{COMPANY_GSTIN}}<br>
+          <strong>Email:</strong> {{COMPANY_EMAIL}} | <strong>Phone:</strong> {{COMPANY_PHONE}}
+        </div>
+      </div>
+
+      <div class="divider-ornament">◆ ◆ ◆</div>
+
+      <!-- Invoice Metadata -->
+      <div class="invoice-metadata">
+        <div class="metadata-box">
+          <h3>Invoice Information</h3>
+          <p><strong>Invoice Number:</strong> {{INVOICE_NUMBER}}</p>
+          <p><strong>Invoice Date:</strong> {{INVOICE_DATE}}</p>
+          <p><strong>Invoice Type:</strong> {{INVOICE_TYPE}}</p>
+          <p><strong>Sale Type:</strong> {{SALE_TYPE}}</p>
+          <p><strong>Reverse Charge:</strong> {{REVERSE_CHARGE}}</p>
+        </div>
+        <div class="metadata-box">
+          <h3>Transport Information</h3>
+          <p><strong>Mode:</strong> {{TRANSPORT_MODE}}</p>
+          <p><strong>Vehicle:</strong> {{VEHICLE_NUMBER}}</p>
+          <p><strong>Transporter:</strong> {{TRANSPORTER_NAME}}</p>
+          <p><strong>Date of Supply:</strong> {{DATE_OF_SUPPLY}}</p>
+          <p><strong>E-Way Bill:</strong> {{EWAY_BILL_NUMBER}}</p>
+        </div>
+      </div>
+
+      <!-- Party Details -->
+      <div class="parties-section">
+        <div class="party-box">
+          <h3>Billed To</h3>
+          <p>{{RECEIVER_NAME}}</p>
+          <p>{{RECEIVER_ADDRESS}}</p>
+          <p>{{RECEIVER_STATE}}</p>
+          <p><strong>GSTIN:</strong> {{RECEIVER_GSTIN}}</p>
+          <p><strong>State Code:</strong> {{RECEIVER_STATE_CODE}}</p>
+        </div>
+        <div class="party-box">
+          <h3>Shipped To</h3>
+          <p>{{CONSIGNEE_NAME}}</p>
+          <p>{{CONSIGNEE_ADDRESS}}</p>
+          <p>{{CONSIGNEE_STATE}}</p>
+          <p><strong>GSTIN:</strong> {{CONSIGNEE_GSTIN}}</p>
+          <p><strong>State Code:</strong> {{CONSIGNEE_STATE_CODE}}</p>
+        </div>
+      </div>
+
+      <div class="divider-ornament">※ ※ ※</div>
+
+      <!-- Items Table -->
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th style="width: 5%;">Sr.</th>
+            <th style="width: 26%;">Description of Goods</th>
+            <th class="text-right" style="width: 8%;">HSN</th>
+            <th class="text-right" style="width: 8%;">Qty</th>
+            <th class="text-right" style="width: 10%;">Rate</th>
+            <th class="text-right" style="width: 11%;">Amount</th>
+            {{TAX_HEADERS}}
+            <th class="text-right" style="width: 12%;">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ITEMS_ROWS}}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="5" class="text-right"><strong>TOTAL:</strong></td>
+            <td class="text-right"><strong>₹{{TOTAL_TAXABLE_VALUE}}</strong></td>
+            {{TAX_TOTALS}}
+            <td class="text-right total-row"><strong>₹{{GRAND_TOTAL}}</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <!-- Amount in Words -->
+      <div class="amount-words-section">
+        <p><strong>Total Amount in Words:</strong><br>{{AMOUNT_IN_WORDS}}</p>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer-section">
+        <div class="terms-box">
+          <h3>Terms & Conditions</h3>
+          <p>{{TERMS_AND_CONDITIONS}}</p>
+        </div>
+        <div class="signature-box">
+          <h3>For {{COMPANY_NAME}}</h3>
+          <div class="signature-space"></div>
+          <p>Authorized Signatory</p>
+        </div>
+      </div>
+
+      <div class="closing-ornament">❦ ◆ ❦</div>
+    </div>
+  </div>
+</body>
+</html>
