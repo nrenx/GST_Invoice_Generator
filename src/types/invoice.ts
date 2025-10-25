@@ -18,6 +18,8 @@ export interface InvoiceItem {
   sgstAmount: number;
   igstRate: number;
   igstAmount: number;
+  cessRate: number;
+  cessAmount: number;
   totalAmount: number;
 }
 
@@ -115,8 +117,8 @@ export interface TemplateOptions {
 export interface HSNCode {
   code: string;
   description: string;
-  rate: number;
   cgst: number;
   sgst: number;
   igst: number;
+  cess?: number;
 }

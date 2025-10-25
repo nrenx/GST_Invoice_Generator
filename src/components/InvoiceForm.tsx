@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useFieldArray, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Trash2, Eye, Download, Copy } from "lucide-react";
 import { AutoCompleteInput, type AutoCompleteOption } from "@/components/ui/auto-complete-input";
-import { hsnCodes, uomOptions, transportModes, indianStates } from "@/data/hsnCodes";
+import { hsnCodes, hsnCodeMap, normalizeHsnCode, uomOptions, transportModes, indianStates } from "@/data/hsnCodes";
 import { InvoiceData, InvoiceItem } from "@/types/invoice";
 import { toast } from "sonner";
 
@@ -84,6 +84,10 @@ const invoiceSchema = z.object({
     quantity: z.number().min(0.01, "Quantity must be greater than 0"),
     uom: z.string().min(1, "UOM is required"),
     rate: z.number().min(0.01, "Rate must be greater than 0"),
+    cessRate: z
+      .number({ invalid_type_error: "Compensation cess must be a number" })
+      .min(0, "Compensation cess cannot be negative")
+      .default(0),
   })).min(1, "At least one item is required"),
   termsAndConditions: z.string().default(
     "1. This is an electronically generated invoice.\n2. All disputes are subject to GUDUR jurisdiction only.\n3. If the Consignee makes any Inter State Sale, he has to pay GST himself.\n4. Goods once sold cannot be taken back or exchanged.\n5. Payment terms as per agreement between buyer and seller."
@@ -93,9 +97,12 @@ const invoiceSchema = z.object({
 type InvoiceFormData = z.infer<typeof invoiceSchema>;
 
 const getFormStorageKey = (profileId: string) => `invoice-form-data-${profileId}`;
-const DEFAULT_HSN_CODE = "4404";
-const DEFAULT_UOM = "MTS";
-const DESCRIPTION_OPTIONS = ["Casuarina Poles", "Casuarina Wood"];
+const DEFAULT_UOM = uomOptions[0] ?? "MTS";
+const DEFAULT_HSN_CODE = normalizeHsnCode(hsnCodes[0]?.code ?? "4404");
+const DEFAULT_HSN_DETAILS = hsnCodeMap.get(DEFAULT_HSN_CODE);
+const DESCRIPTION_OPTIONS = Array.from(new Set(hsnCodes.map((entry) => entry.description)))
+  .filter((description): description is string => Boolean(description && description.trim()))
+  .sort((a, b) => a.localeCompare(b));
 const GSTIN_SUGGESTIONS: AutoCompleteOption[] = [{ value: "UNREGISTERED" }];
 const STATE_NAME_OPTIONS: AutoCompleteOption[] = indianStates.map((state) => ({
   value: state.name,
@@ -107,11 +114,18 @@ const STATE_CODE_OPTIONS: AutoCompleteOption[] = indianStates.map((state) => ({
   label: `${state.code} — ${state.name}`,
   keywords: [state.name],
 }));
-const DESCRIPTION_SUGGESTIONS: AutoCompleteOption[] = DESCRIPTION_OPTIONS.map((description) => ({ value: description }));
+const normalizeStateName = (value: string) => value.replace(/\s+/g, " ").trim().toLowerCase();
+const normalizeStateCodeValue = (value: string) => value.trim().toUpperCase();
+const STATE_NAME_LOOKUP = new Map(indianStates.map((state) => [normalizeStateName(state.name), state]));
+const STATE_CODE_LOOKUP = new Map(indianStates.map((state) => [state.code, state]));
+const DESCRIPTION_SUGGESTIONS: AutoCompleteOption[] = DESCRIPTION_OPTIONS.map((description) => ({
+  value: description,
+  label: description,
+}));
 const HSN_CODE_OPTIONS: AutoCompleteOption[] = hsnCodes.map((hsn) => ({
   value: hsn.code,
   label: `${hsn.code} — ${hsn.description}`,
-  keywords: [hsn.description],
+  keywords: [hsn.description, hsn.code],
 }));
 const UOM_SUGGESTIONS: AutoCompleteOption[] = uomOptions.map((unit) => ({ value: unit }));
 const TERMS_TEMPLATE = "1. This is an electronically generated invoice.\n2. All disputes are subject to GUDUR jurisdiction only.\n3. If the Consignee makes any Inter State Sale, he has to pay GST himself.\n4. Goods once sold cannot be taken back or exchanged.\n5. Payment terms as per agreement between buyer and seller.";
@@ -126,6 +140,14 @@ const currencyFormatter = new Intl.NumberFormat("en-IN", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
+
+const formatPercent = (value?: number) => {
+  if (typeof value !== "number" || Number.isNaN(value)) {
+    return "0.00%";
+  }
+
+  return `${value.toFixed(2)}%`;
+};
 
 const formatDateDDMMYYYY = (date: Date) => {
   const day = String(date.getDate()).padStart(2, "0");
@@ -161,17 +183,20 @@ type ItemFormValue = {
   quantity?: number;
   uom?: string;
   rate?: number;
+  cessRate?: number;
 };
 
 const buildDefaultItem = (): ItemFormValue => {
-  const defaultHSNData = hsnCodes.find((hsn) => hsn.code === DEFAULT_HSN_CODE);
+  const baseCode = DEFAULT_HSN_CODE;
+  const hsnDetails = DEFAULT_HSN_DETAILS ?? hsnCodeMap.get(baseCode);
 
   return {
-    description: "",
-    hsnCode: DEFAULT_HSN_CODE,
+    description: hsnDetails?.description ?? "",
+    hsnCode: baseCode,
     quantity: 0,
     uom: DEFAULT_UOM,
-    rate: defaultHSNData?.rate ?? 0,
+    rate: 0,
+    cessRate: hsnDetails?.cess ?? 0,
   };
 };
 
@@ -218,16 +243,23 @@ const buildBaseDefaults = (profile?: Profile): InvoiceFormData => {
 const mergeItemsWithDefaults = (items: unknown[]): InvoiceFormData["items"] => {
   return items.map((item) => {
     const castItem = item as ItemFormValue;
-    const parsedHSNCode = castItem?.hsnCode || DEFAULT_HSN_CODE;
-    const hsnDetails = hsnCodes.find((hsn) => hsn.code === parsedHSNCode);
-    const fallbackRate = hsnDetails?.rate ?? 0;
+    const rawHSNCode = typeof castItem?.hsnCode === "string" ? castItem.hsnCode : DEFAULT_HSN_CODE;
+    const normalizedHSNCode = normalizeHsnCode(rawHSNCode) || DEFAULT_HSN_CODE;
+  const hsnDetails = hsnCodeMap.get(normalizedHSNCode) ?? DEFAULT_HSN_DETAILS;
 
     return {
-      description: typeof castItem?.description === "string" ? castItem.description : "",
-      hsnCode: parsedHSNCode,
+      description:
+        typeof castItem?.description === "string" && castItem.description.trim()
+          ? castItem.description
+          : hsnDetails?.description ?? "",
+      hsnCode: normalizedHSNCode,
       quantity: typeof castItem?.quantity === "number" && !Number.isNaN(castItem.quantity) ? castItem.quantity : 0,
       uom: typeof castItem?.uom === "string" && castItem.uom ? castItem.uom : DEFAULT_UOM,
-      rate: typeof castItem?.rate === "number" && !Number.isNaN(castItem.rate) ? castItem.rate : fallbackRate,
+      rate: typeof castItem?.rate === "number" && !Number.isNaN(castItem.rate) ? castItem.rate : 0,
+      cessRate:
+        typeof castItem?.cessRate === "number" && !Number.isNaN(castItem.cessRate)
+          ? castItem.cessRate
+          : hsnDetails?.cess ?? 0,
     };
   });
 };
@@ -269,37 +301,52 @@ const getDefaultValues = (profile: Profile): InvoiceFormData => {
 };
 
 function calculateItemTotals(item: ItemFormValue, saleType: string): InvoiceItem {
-  const hsnCode = typeof item.hsnCode === "string" && item.hsnCode ? item.hsnCode : DEFAULT_HSN_CODE;
+  const normalizedHsnCode = normalizeHsnCode(
+    typeof item.hsnCode === "string" && item.hsnCode ? item.hsnCode : DEFAULT_HSN_CODE,
+  ) || DEFAULT_HSN_CODE;
   const quantity = typeof item.quantity === "number" && !Number.isNaN(item.quantity) ? item.quantity : 0;
   const rate = typeof item.rate === "number" && !Number.isNaN(item.rate) ? item.rate : 0;
   const taxableValue = quantity * rate;
-  const hsnData = hsnCodes.find((h) => h.code === hsnCode);
+  const hsnData = hsnCodeMap.get(normalizedHsnCode) ?? DEFAULT_HSN_DETAILS;
 
-  let cgstRate = 0;
-  let sgstRate = 0;
-  let igstRate = 0;
-  let cgstAmount = 0;
-  let sgstAmount = 0;
-  let igstAmount = 0;
+  let cgstRate = hsnData?.cgst ?? 0;
+  let sgstRate = hsnData?.sgst ?? 0;
+  let igstRate = hsnData?.igst ?? 0;
 
-  if (hsnData) {
-    if (saleType === "Intrastate") {
-      cgstRate = hsnData.cgst;
-      sgstRate = hsnData.sgst;
-      cgstAmount = (taxableValue * cgstRate) / 100;
-      sgstAmount = (taxableValue * sgstRate) / 100;
-    } else {
-      igstRate = hsnData.igst;
-      igstAmount = (taxableValue * igstRate) / 100;
+  if (saleType === "Intrastate") {
+    if (cgstRate === 0 && sgstRate === 0 && igstRate > 0) {
+      cgstRate = igstRate / 2;
+      sgstRate = igstRate / 2;
     }
+    igstRate = 0;
+  } else {
+    if (igstRate === 0 && (cgstRate > 0 || sgstRate > 0)) {
+      igstRate = cgstRate + sgstRate;
+    }
+    cgstRate = 0;
+    sgstRate = 0;
   }
 
-  const totalAmount = taxableValue + cgstAmount + sgstAmount + igstAmount;
+  const cgstAmount = (taxableValue * cgstRate) / 100;
+  const sgstAmount = (taxableValue * sgstRate) / 100;
+  const igstAmount = (taxableValue * igstRate) / 100;
+
+  const manualCessRate =
+    typeof item.cessRate === "number" && !Number.isNaN(item.cessRate)
+      ? item.cessRate
+      : hsnData?.cess ?? 0;
+  const cessRate = Math.max(0, manualCessRate);
+  const cessAmount = (taxableValue * cessRate) / 100;
+
+  const totalAmount = taxableValue + cgstAmount + sgstAmount + igstAmount + cessAmount;
 
   return {
     id: Math.random().toString(),
-    description: typeof item.description === "string" ? item.description : "",
-    hsnCode,
+    description:
+      typeof item.description === "string" && item.description.trim()
+        ? item.description
+        : hsnData?.description ?? "",
+    hsnCode: normalizedHsnCode,
     quantity,
     uom: typeof item.uom === "string" ? item.uom : DEFAULT_UOM,
     rate,
@@ -310,6 +357,8 @@ function calculateItemTotals(item: ItemFormValue, saleType: string): InvoiceItem
     sgstAmount,
     igstRate,
     igstAmount,
+    cessRate,
+    cessAmount,
     totalAmount,
   };
 }
@@ -344,6 +393,7 @@ export const InvoiceForm = ({ profile }: InvoiceFormProps) => {
   const invoiceDateValue = watch("invoiceDate");
   const dateOfSupplyValue = watch("dateOfSupply");
   const watchedItems = useWatch({ control, name: "items" });
+  const [isSaleTypeManuallySet, setIsSaleTypeManuallySet] = useState(false);
 
   const effectiveSaleType = watchSaleType || "Interstate";
 
@@ -352,6 +402,22 @@ export const InvoiceForm = ({ profile }: InvoiceFormProps) => {
 
   // Watch all form data and save to localStorage
   const watchedFormData = watch();
+
+  useEffect(() => {
+    if (!watchCompanyStateCode || !watchReceiverStateCode || !watchSaleType) {
+      return;
+    }
+
+    const derivedSaleType = determineSaleType(watchCompanyStateCode, watchReceiverStateCode);
+
+    if (watchSaleType !== derivedSaleType) {
+      if (!isSaleTypeManuallySet) {
+        setIsSaleTypeManuallySet(true);
+      }
+    } else if (isSaleTypeManuallySet) {
+      setIsSaleTypeManuallySet(false);
+    }
+  }, [watchCompanyStateCode, watchReceiverStateCode, watchSaleType, isSaleTypeManuallySet]);
 
   useEffect(() => {
     // Save form data to localStorage whenever form changes
@@ -372,60 +438,26 @@ export const InvoiceForm = ({ profile }: InvoiceFormProps) => {
     return () => clearTimeout(timeoutId);
   }, [watchedFormData, profile.id]);
 
-  // Auto-update sale type when state codes change
+  // Auto-update sale type when state codes change unless user overrides
   useEffect(() => {
-    if (watchCompanyStateCode && watchReceiverStateCode) {
-      const newSaleType = determineSaleType(watchCompanyStateCode, watchReceiverStateCode);
-      if (newSaleType !== watchSaleType) {
-        setValue("saleType", newSaleType, { shouldDirty: true, shouldValidate: true });
-        toast.success(`Sale type updated to ${newSaleType}`);
+    if (!watchCompanyStateCode || !watchReceiverStateCode) {
+      return;
+    }
+
+    const derivedSaleType = determineSaleType(watchCompanyStateCode, watchReceiverStateCode);
+
+    if (isSaleTypeManuallySet) {
+      if (watchSaleType === derivedSaleType) {
+        setIsSaleTypeManuallySet(false);
       }
-    }
-  }, [watchCompanyStateCode, watchReceiverStateCode, setValue, watchSaleType]);
-
-  useEffect(() => {
-    const trimmedState = receiverStateValue?.trim();
-    if (!trimmedState) {
       return;
     }
-    const match = indianStates.find((state) => state.name.toLowerCase() === trimmedState.toLowerCase());
-    if (match && watchReceiverStateCode !== match.code) {
-      setValue("receiverStateCode", match.code, { shouldDirty: true, shouldValidate: true });
-    }
-  }, [receiverStateValue, watchReceiverStateCode, setValue]);
 
-  useEffect(() => {
-    const trimmedCode = watchReceiverStateCode?.trim();
-    if (!trimmedCode) {
-      return;
+    if (derivedSaleType !== watchSaleType) {
+      setValue("saleType", derivedSaleType, { shouldDirty: false, shouldValidate: true });
+      toast.success(`Sale type updated to ${derivedSaleType}`);
     }
-    const match = indianStates.find((state) => state.code === trimmedCode);
-    if (match && receiverStateValue !== match.name) {
-      setValue("receiverState", match.name, { shouldDirty: true, shouldValidate: true });
-    }
-  }, [watchReceiverStateCode, receiverStateValue, setValue]);
-
-  useEffect(() => {
-    const trimmedState = consigneeStateValue?.trim();
-    if (!trimmedState) {
-      return;
-    }
-    const match = indianStates.find((state) => state.name.toLowerCase() === trimmedState.toLowerCase());
-    if (match && watchConsigneeStateCode !== match.code) {
-      setValue("consigneeStateCode", match.code, { shouldDirty: true, shouldValidate: true });
-    }
-  }, [consigneeStateValue, watchConsigneeStateCode, setValue]);
-
-  useEffect(() => {
-    const trimmedCode = watchConsigneeStateCode?.trim();
-    if (!trimmedCode) {
-      return;
-    }
-    const match = indianStates.find((state) => state.code === trimmedCode);
-    if (match && consigneeStateValue !== match.name) {
-      setValue("consigneeState", match.name, { shouldDirty: true, shouldValidate: true });
-    }
-  }, [watchConsigneeStateCode, consigneeStateValue, setValue]);
+  }, [watchCompanyStateCode, watchReceiverStateCode, watchSaleType, isSaleTypeManuallySet, setValue]);
 
   // Auto-determine sale type based on state codes
   const determineSaleType = (companyCode: string, receiverCode: string) => {
@@ -454,6 +486,7 @@ export const InvoiceForm = ({ profile }: InvoiceFormProps) => {
     const defaults = buildBaseDefaults(profile);
 
     reset(defaults);
+    setIsSaleTypeManuallySet(false);
     if (typeof window !== "undefined") {
       const storageKey = getFormStorageKey(profile.id);
       window.localStorage.removeItem(storageKey);
@@ -662,7 +695,10 @@ export const InvoiceForm = ({ profile }: InvoiceFormProps) => {
               <Label htmlFor="saleType">Sale Type *</Label>
               <Select
                 value={effectiveSaleType}
-                onValueChange={(value) => setValue("saleType", value, { shouldDirty: true, shouldValidate: true })}
+                onValueChange={(value) => {
+                  setIsSaleTypeManuallySet(true);
+                  setValue("saleType", value, { shouldDirty: true, shouldValidate: true });
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select sale type" />
@@ -808,22 +844,37 @@ export const InvoiceForm = ({ profile }: InvoiceFormProps) => {
                     name={field.name}
                     ref={field.ref}
                     value={field.value ?? ""}
-                    onChange={field.onChange}
+                    onChange={(value) => {
+                      field.onChange(value);
+                      if (!value.trim()) {
+                        setValue("receiverStateCode", "", { shouldDirty: true, shouldValidate: true });
+                      }
+                    }}
                     onBlur={(event) => {
                       field.onBlur();
                       const typed = event.target.value.trim();
                       if (!typed) {
+                        setValue("receiverState", "", { shouldDirty: true, shouldValidate: true });
+                        setValue("receiverStateCode", "", { shouldDirty: true, shouldValidate: true });
                         return;
                       }
-                      const match = indianStates.find((state) => state.name.toLowerCase() === typed.toLowerCase());
+                      const match = STATE_NAME_LOOKUP.get(normalizeStateName(typed));
                       if (match) {
+                        setValue("receiverState", match.name, { shouldDirty: true, shouldValidate: true });
                         setValue("receiverStateCode", match.code, { shouldDirty: true, shouldValidate: true });
+                      } else {
+                        setValue("receiverState", typed, { shouldDirty: true, shouldValidate: true });
+                        setValue("receiverStateCode", "", { shouldDirty: true, shouldValidate: true });
                       }
                     }}
                     onOptionSelect={(option) => {
-                      const match = indianStates.find((state) => state.name === option.value);
+                      const match = STATE_NAME_LOOKUP.get(normalizeStateName(option.value));
                       if (match) {
+                        setValue("receiverState", match.name, { shouldDirty: true, shouldValidate: true });
                         setValue("receiverStateCode", match.code, { shouldDirty: true, shouldValidate: true });
+                      } else {
+                        setValue("receiverState", option.value, { shouldDirty: true, shouldValidate: true });
+                        setValue("receiverStateCode", "", { shouldDirty: true, shouldValidate: true });
                       }
                     }}
                     placeholder="Type or select state"
@@ -845,22 +896,38 @@ export const InvoiceForm = ({ profile }: InvoiceFormProps) => {
                     name={field.name}
                     ref={field.ref}
                     value={field.value ?? ""}
-                    onChange={field.onChange}
+                    onChange={(value) => {
+                      const normalized = normalizeStateCodeValue(value);
+                      field.onChange(normalized);
+                      if (!normalized) {
+                        setValue("receiverState", "", { shouldDirty: true, shouldValidate: true });
+                      }
+                    }}
                     onBlur={(event) => {
                       field.onBlur();
-                      const typed = event.target.value.trim();
+                      const typed = normalizeStateCodeValue(event.target.value);
                       if (!typed) {
+                        setValue("receiverStateCode", "", { shouldDirty: true, shouldValidate: true });
+                        setValue("receiverState", "", { shouldDirty: true, shouldValidate: true });
                         return;
                       }
-                      const match = indianStates.find((state) => state.code === typed);
+                      const match = STATE_CODE_LOOKUP.get(typed);
                       if (match) {
+                        setValue("receiverStateCode", match.code, { shouldDirty: true, shouldValidate: true });
                         setValue("receiverState", match.name, { shouldDirty: true, shouldValidate: true });
+                      } else {
+                        setValue("receiverStateCode", typed, { shouldDirty: true, shouldValidate: true });
+                        setValue("receiverState", "", { shouldDirty: true, shouldValidate: true });
                       }
                     }}
                     onOptionSelect={(option) => {
-                      const match = indianStates.find((state) => state.code === option.value);
+                      const normalized = normalizeStateCodeValue(option.value);
+                      const match = STATE_CODE_LOOKUP.get(normalized);
+                      setValue("receiverStateCode", normalized, { shouldDirty: true, shouldValidate: true });
                       if (match) {
                         setValue("receiverState", match.name, { shouldDirty: true, shouldValidate: true });
+                      } else {
+                        setValue("receiverState", "", { shouldDirty: true, shouldValidate: true });
                       }
                     }}
                     placeholder="Type or select code"
@@ -940,22 +1007,37 @@ export const InvoiceForm = ({ profile }: InvoiceFormProps) => {
                     name={field.name}
                     ref={field.ref}
                     value={field.value ?? ""}
-                    onChange={field.onChange}
+                    onChange={(value) => {
+                      field.onChange(value);
+                      if (!value.trim()) {
+                        setValue("consigneeStateCode", "", { shouldDirty: true, shouldValidate: true });
+                      }
+                    }}
                     onBlur={(event) => {
                       field.onBlur();
                       const typed = event.target.value.trim();
                       if (!typed) {
+                        setValue("consigneeState", "", { shouldDirty: true, shouldValidate: true });
+                        setValue("consigneeStateCode", "", { shouldDirty: true, shouldValidate: true });
                         return;
                       }
-                      const match = indianStates.find((state) => state.name.toLowerCase() === typed.toLowerCase());
+                      const match = STATE_NAME_LOOKUP.get(normalizeStateName(typed));
                       if (match) {
+                        setValue("consigneeState", match.name, { shouldDirty: true, shouldValidate: true });
                         setValue("consigneeStateCode", match.code, { shouldDirty: true, shouldValidate: true });
+                      } else {
+                        setValue("consigneeState", typed, { shouldDirty: true, shouldValidate: true });
+                        setValue("consigneeStateCode", "", { shouldDirty: true, shouldValidate: true });
                       }
                     }}
                     onOptionSelect={(option) => {
-                      const match = indianStates.find((state) => state.name === option.value);
+                      const match = STATE_NAME_LOOKUP.get(normalizeStateName(option.value));
                       if (match) {
+                        setValue("consigneeState", match.name, { shouldDirty: true, shouldValidate: true });
                         setValue("consigneeStateCode", match.code, { shouldDirty: true, shouldValidate: true });
+                      } else {
+                        setValue("consigneeState", option.value, { shouldDirty: true, shouldValidate: true });
+                        setValue("consigneeStateCode", "", { shouldDirty: true, shouldValidate: true });
                       }
                     }}
                     placeholder="Type or select state"
@@ -977,22 +1059,38 @@ export const InvoiceForm = ({ profile }: InvoiceFormProps) => {
                     name={field.name}
                     ref={field.ref}
                     value={field.value ?? ""}
-                    onChange={field.onChange}
+                    onChange={(value) => {
+                      const normalized = normalizeStateCodeValue(value);
+                      field.onChange(normalized);
+                      if (!normalized) {
+                        setValue("consigneeState", "", { shouldDirty: true, shouldValidate: true });
+                      }
+                    }}
                     onBlur={(event) => {
                       field.onBlur();
-                      const typed = event.target.value.trim();
+                      const typed = normalizeStateCodeValue(event.target.value);
                       if (!typed) {
+                        setValue("consigneeStateCode", "", { shouldDirty: true, shouldValidate: true });
+                        setValue("consigneeState", "", { shouldDirty: true, shouldValidate: true });
                         return;
                       }
-                      const match = indianStates.find((state) => state.code === typed);
+                      const match = STATE_CODE_LOOKUP.get(typed);
                       if (match) {
+                        setValue("consigneeStateCode", match.code, { shouldDirty: true, shouldValidate: true });
                         setValue("consigneeState", match.name, { shouldDirty: true, shouldValidate: true });
+                      } else {
+                        setValue("consigneeStateCode", typed, { shouldDirty: true, shouldValidate: true });
+                        setValue("consigneeState", "", { shouldDirty: true, shouldValidate: true });
                       }
                     }}
                     onOptionSelect={(option) => {
-                      const match = indianStates.find((state) => state.code === option.value);
+                      const normalized = normalizeStateCodeValue(option.value);
+                      const match = STATE_CODE_LOOKUP.get(normalized);
+                      setValue("consigneeStateCode", normalized, { shouldDirty: true, shouldValidate: true });
                       if (match) {
                         setValue("consigneeState", match.name, { shouldDirty: true, shouldValidate: true });
+                      } else {
+                        setValue("consigneeState", "", { shouldDirty: true, shouldValidate: true });
                       }
                     }}
                     placeholder="Type or select code"
@@ -1018,12 +1116,21 @@ export const InvoiceForm = ({ profile }: InvoiceFormProps) => {
           {fields.map((field, index) => {
             const currentItem = itemsForCalculation[index] ?? buildDefaultItem();
             const derivedItem = derivedItems[index];
-            const gstRateLabel = derivedItem
-              ? effectiveSaleType === "Intrastate"
-                ? `CGST ${derivedItem.cgstRate}% + SGST ${derivedItem.sgstRate}%`
-                : `IGST ${derivedItem.igstRate}%`
-              : "Select HSN code";
             const taxableAmountLabel = currencyFormatter.format(derivedItem?.taxableValue ?? 0);
+            const cgstRateLabel = formatPercent(derivedItem?.cgstRate);
+            const sgstRateLabel = formatPercent(derivedItem?.sgstRate);
+            const igstRateLabel = formatPercent(derivedItem?.igstRate);
+            const cessRateLabel = formatPercent(derivedItem?.cessRate ?? currentItem.cessRate);
+            const cgstAmountLabel = currencyFormatter.format(derivedItem?.cgstAmount ?? 0);
+            const sgstAmountLabel = currencyFormatter.format(derivedItem?.sgstAmount ?? 0);
+            const igstAmountLabel = currencyFormatter.format(derivedItem?.igstAmount ?? 0);
+            const cessAmountLabel = currencyFormatter.format(derivedItem?.cessAmount ?? 0);
+            const totalTaxAmountLabel = currencyFormatter.format(
+              (derivedItem?.cgstAmount ?? 0) +
+              (derivedItem?.sgstAmount ?? 0) +
+              (derivedItem?.igstAmount ?? 0) +
+              (derivedItem?.cessAmount ?? 0)
+            );
             const totalAmountLabel = currencyFormatter.format(derivedItem?.totalAmount ?? 0);
 
             return (
@@ -1037,6 +1144,64 @@ export const InvoiceForm = ({ profile }: InvoiceFormProps) => {
                   )}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2 space-y-2">
+                    <Label>HSN/SAC Code *</Label>
+                    <Controller
+                      control={control}
+                      name={`items.${index}.hsnCode` as const}
+                      render={({ field }) => (
+                        <AutoCompleteInput
+                          id={`item-${index}-hsn`}
+                          name={field.name}
+                          ref={field.ref}
+                          value={field.value ?? ""}
+                          onChange={(value) => field.onChange(normalizeHsnCode(value))}
+                          onBlur={(event) => {
+                            field.onBlur();
+                            const typed = normalizeHsnCode(event.target.value);
+                            if (!typed) {
+                              return;
+                            }
+                            const match = hsnCodeMap.get(typed);
+                            if (match) {
+                              setValue(`items.${index}.hsnCode`, match.code, { shouldDirty: true, shouldValidate: true });
+                              setValue(`items.${index}.description`, match.description, {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                              });
+                              setValue(`items.${index}.cessRate`, match.cess ?? 0, {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                              });
+                            }
+                          }}
+                          onOptionSelect={(option) => {
+                            const normalized = normalizeHsnCode(option.value);
+                            field.onChange(normalized);
+                            const match = hsnCodeMap.get(normalized);
+                            if (!match) {
+                              return;
+                            }
+                            setValue(`items.${index}.hsnCode`, match.code, { shouldDirty: true, shouldValidate: true });
+                            setValue(`items.${index}.description`, match.description, {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            });
+                            setValue(`items.${index}.cessRate`, match.cess ?? 0, {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            });
+                          }}
+                          placeholder="Enter HSN/SAC code"
+                          options={HSN_CODE_OPTIONS}
+                          emptyMessage="No matching HSN code"
+                        />
+                      )}
+                    />
+                    {errors.items?.[index]?.hsnCode && (
+                      <p className="text-sm text-destructive mt-1">{errors.items[index]?.hsnCode?.message}</p>
+                    )}
+                  </div>
                   <div className="md:col-span-2 space-y-2">
                     <Label>Description *</Label>
                     <Controller
@@ -1058,46 +1223,6 @@ export const InvoiceForm = ({ profile }: InvoiceFormProps) => {
                     />
                     {errors.items?.[index]?.description && (
                       <p className="text-sm text-destructive mt-1">{errors.items[index]?.description?.message}</p>
-                    )}
-                  </div>
-                  <div>
-                    <Label>HSN/SAC Code *</Label>
-                    <Controller
-                      control={control}
-                      name={`items.${index}.hsnCode` as const}
-                      render={({ field }) => (
-                        <AutoCompleteInput
-                          id={`item-${index}-hsn`}
-                          name={field.name}
-                          ref={field.ref}
-                          value={field.value ?? ""}
-                          onChange={(value) => field.onChange(value.toUpperCase())}
-                          onBlur={(event) => {
-                            field.onBlur();
-                            const typed = event.target.value.trim().toUpperCase();
-                            if (!typed) {
-                              return;
-                            }
-                            const match = hsnCodes.find((hsn) => hsn.code === typed);
-                            if (match) {
-                              setValue(`items.${index}.hsnCode`, match.code, { shouldDirty: true, shouldValidate: true });
-                              setValue(`items.${index}.rate`, match.rate, { shouldDirty: true, shouldValidate: true });
-                            }
-                          }}
-                          onOptionSelect={(option) => {
-                            const match = hsnCodes.find((hsn) => hsn.code === option.value);
-                            if (match) {
-                              setValue(`items.${index}.rate`, match.rate, { shouldDirty: true, shouldValidate: true });
-                            }
-                          }}
-                          placeholder="Enter HSN/SAC code"
-                          options={HSN_CODE_OPTIONS}
-                          emptyMessage="No matching HSN code"
-                        />
-                      )}
-                    />
-                    {errors.items?.[index]?.hsnCode && (
-                      <p className="text-sm text-destructive mt-1">{errors.items[index]?.hsnCode?.message}</p>
                     )}
                   </div>
                   <div>
@@ -1149,15 +1274,64 @@ export const InvoiceForm = ({ profile }: InvoiceFormProps) => {
                       <p className="text-sm text-destructive mt-1">{errors.items[index]?.rate?.message}</p>
                     )}
                   </div>
+                  <div>
+                    <Label>Compensation Cess (%)</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      {...register(`items.${index}.cessRate`, { valueAsNumber: true })}
+                      placeholder="0"
+                    />
+                    {errors.items?.[index]?.cessRate && (
+                      <p className="text-sm text-destructive mt-1">{errors.items[index]?.cessRate?.message}</p>
+                    )}
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div>
+                    <Label>CGST Rate</Label>
+                    <Input value={cgstRateLabel} readOnly className={COMPUTED_INPUT_CLASSES} />
+                  </div>
+                  <div>
+                    <Label>SGST Rate</Label>
+                    <Input value={sgstRateLabel} readOnly className={COMPUTED_INPUT_CLASSES} />
+                  </div>
+                  <div>
+                    <Label>IGST Rate</Label>
+                    <Input value={igstRateLabel} readOnly className={COMPUTED_INPUT_CLASSES} />
+                  </div>
+                  <div>
+                    <Label>Compensation Cess Rate</Label>
+                    <Input value={cessRateLabel} readOnly className={COMPUTED_INPUT_CLASSES} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div>
+                    <Label>CGST Amount</Label>
+                    <Input value={cgstAmountLabel} readOnly className={COMPUTED_INPUT_CLASSES} />
+                  </div>
+                  <div>
+                    <Label>SGST Amount</Label>
+                    <Input value={sgstAmountLabel} readOnly className={COMPUTED_INPUT_CLASSES} />
+                  </div>
+                  <div>
+                    <Label>IGST Amount</Label>
+                    <Input value={igstAmountLabel} readOnly className={COMPUTED_INPUT_CLASSES} />
+                  </div>
+                  <div>
+                    <Label>Compensation Cess Amount</Label>
+                    <Input value={cessAmountLabel} readOnly className={COMPUTED_INPUT_CLASSES} />
+                  </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <Label>GST Rate</Label>
-                    <Input value={gstRateLabel} readOnly className={COMPUTED_INPUT_CLASSES} />
-                  </div>
-                  <div>
                     <Label>Taxable Amount</Label>
                     <Input value={taxableAmountLabel} readOnly className={COMPUTED_INPUT_CLASSES} />
+                  </div>
+                  <div>
+                    <Label>Total Tax</Label>
+                    <Input value={totalTaxAmountLabel} readOnly className={COMPUTED_INPUT_CLASSES} />
                   </div>
                   <div>
                     <Label>Total Amount</Label>

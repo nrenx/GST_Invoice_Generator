@@ -42,7 +42,8 @@ export const injectDataIntoTemplate = (
   const totalCGST = invoiceData.items.reduce((sum, item) => sum + item.cgstAmount, 0);
   const totalSGST = invoiceData.items.reduce((sum, item) => sum + item.sgstAmount, 0);
   const totalIGST = invoiceData.items.reduce((sum, item) => sum + item.igstAmount, 0);
-  const totalTax = totalCGST + totalSGST + totalIGST;
+  const totalCess = invoiceData.items.reduce((sum, item) => sum + item.cessAmount, 0);
+  const totalTax = totalCGST + totalSGST + totalIGST + totalCess;
   const grandTotal = totalTaxableValue + totalTax;
   const totalQuantity = invoiceData.items.reduce((sum, item) => sum + item.quantity, 0);
   const totalAmount = invoiceData.items.reduce((sum, item) => sum + item.taxableValue, 0);
@@ -73,8 +74,8 @@ export const injectDataIntoTemplate = (
 
   const dynamicItemsRows = invoiceData.items.map((item, index) => {
     const taxCells = isInterstate
-      ? `<td class="text-right">₹${formatCurrency(item.igstAmount)}</td>`
-      : `<td class="text-right">₹${formatCurrency(item.cgstAmount)}</td><td class="text-right">₹${formatCurrency(item.sgstAmount)}</td>`;
+      ? `<td class="text-right">₹${formatCurrency(item.igstAmount)}</td><td class="text-right">₹${formatCurrency(item.cessAmount)}</td>`
+      : `<td class="text-right">₹${formatCurrency(item.cgstAmount)}</td><td class="text-right">₹${formatCurrency(item.sgstAmount)}</td><td class="text-right">₹${formatCurrency(item.cessAmount)}</td>`;
 
     return `
       <tr>
@@ -91,12 +92,19 @@ export const injectDataIntoTemplate = (
   }).join('');
 
   const taxHeaders = isInterstate
-    ? '<th class="text-right" style="width: 12%;">IGST</th>'
-    : '<th class="text-right" style="width: 10%;">CGST</th><th class="text-right" style="width: 10%;">SGST</th>';
+    ? '<th class="text-right" style="width: 12%;">IGST</th><th class="text-right" style="width: 12%;">Compensation Cess</th>'
+    : '<th class="text-right" style="width: 10%;">CGST</th><th class="text-right" style="width: 10%;">SGST</th><th class="text-right" style="width: 12%;">Compensation Cess</th>';
 
   const taxTotals = isInterstate
-    ? `<td class="text-right">₹${formatCurrency(totalIGST)}</td>`
-    : `<td class="text-right">₹${formatCurrency(totalCGST)}</td><td class="text-right">₹${formatCurrency(totalSGST)}</td>`;
+    ? `<td class="text-right">₹${formatCurrency(totalIGST)}</td><td class="text-right">₹${formatCurrency(totalCess)}</td>`
+    : `<td class="text-right">₹${formatCurrency(totalCGST)}</td><td class="text-right">₹${formatCurrency(totalSGST)}</td><td class="text-right">₹${formatCurrency(totalCess)}</td>`;
+
+  const cgstHeaderLabel = isInterstate ? "CGST Not Apply" : "CGST Rate (%)";
+  const cgstHeaderClass = isInterstate ? "red-header" : "";
+  const sgstHeaderLabel = isInterstate ? "SGST Not Apply" : "SGST Rate (%)";
+  const sgstHeaderClass = isInterstate ? "red-header" : "";
+  const igstHeaderLabel = isInterstate ? "IGST Rate (%)" : "IGST Not Apply";
+  const igstHeaderClass = isInterstate ? "" : "red-header";
 
   // Calculate tax rate totals (for display in totals row)
   const totalCGSTRate = invoiceData.items.length > 0 && totalCGST > 0 
@@ -155,7 +163,13 @@ export const injectDataIntoTemplate = (
     .replace(/{{TOTAL_TAX}}/g, totalTax.toFixed(2))
     .replace(/{{GRAND_TOTAL}}/g, grandTotal.toFixed(2))
     .replace(/{{AMOUNT_IN_WORDS}}/g, amountInWords)
-    .replace(/{{TERMS_AND_CONDITIONS}}/g, invoiceData.termsAndConditions || '');
+  .replace(/{{TERMS_AND_CONDITIONS}}/g, invoiceData.termsAndConditions || '')
+  .replace(/{{CGST_HEADER_LABEL}}/g, cgstHeaderLabel)
+  .replace(/{{CGST_HEADER_CLASS}}/g, cgstHeaderClass)
+  .replace(/{{SGST_HEADER_LABEL}}/g, sgstHeaderLabel)
+  .replace(/{{SGST_HEADER_CLASS}}/g, sgstHeaderClass)
+  .replace(/{{IGST_HEADER_LABEL}}/g, igstHeaderLabel)
+  .replace(/{{IGST_HEADER_CLASS}}/g, igstHeaderClass);
 
   if (hasDynamicTaxPlaceholders) {
     result = result

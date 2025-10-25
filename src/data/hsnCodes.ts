@@ -1,15 +1,88 @@
+import goodsRatesRaw from "./gst-goods-rates.json";
 import { HSNCode } from "@/types/invoice";
 
-export const hsnCodes: HSNCode[] = [
-  { code: "4401", description: "Wood in chips or particles; sawdust and wood waste", rate: 8, cgst: 2.5, sgst: 2.5, igst: 5 },
-  { code: "4404", description: "Hoopwood; split poles; piles, pickets and stakes (Casuarina Poles)", rate: 35, cgst: 6, sgst: 6, igst: 12 },
-  { code: "4405", description: "Wood wool; wood flour", rate: 16, cgst: 6, sgst: 6, igst: 12 },
-  { code: "4406", description: "Railway or tramway sleepers of wood", rate: 1500, cgst: 6, sgst: 6, igst: 12 },
-  { code: "4408", description: "Sheets for veneering, for plywood", rate: 95, cgst: 6, sgst: 6, igst: 12 },
-  { code: "4409", description: "Bamboo flooring", rate: 190, cgst: 6, sgst: 6, igst: 12 },
-  { code: "4601", description: "Mats, matting and screens of vegetable material", rate: 250, cgst: 2.5, sgst: 2.5, igst: 5 },
-  { code: "4823", description: "Articles made of paper mache", rate: 1000, cgst: 2.5, sgst: 2.5, igst: 5 },
-];
+type GoodsRateRecord = {
+  chapterHeading: string;
+  description: string;
+  cgstRate: string;
+  sgstRate: string;
+  igstRate: string;
+};
+
+const normalizeHsnCode = (value: string): string => value.replace(/[^0-9A-Za-z]/g, "").toUpperCase();
+
+const parseRate = (value: string): number => {
+  if (!value) {
+    return 0;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed || /^nil$/i.test(trimmed)) {
+    return 0;
+  }
+
+  const numeric = Number.parseFloat(trimmed.replace(/[^0-9.]/g, ""));
+  return Number.isFinite(numeric) ? numeric : 0;
+};
+
+const asGoodsRates = goodsRatesRaw as GoodsRateRecord[];
+
+const hsnCodeEntries = new Map<string, HSNCode>();
+
+for (const record of asGoodsRates) {
+  const rawCodes = record?.chapterHeading;
+  const rawDescription = record?.description?.trim();
+
+  if (!rawCodes || !rawDescription || /^\[?omitted/i.test(rawDescription)) {
+    continue;
+  }
+
+  const codes = rawCodes
+    .split(",")
+    .map((segment) => normalizeHsnCode(segment))
+    .filter((code) => code.length >= 4);
+
+  if (!codes.length) {
+    continue;
+  }
+
+  const cgst = parseRate(record.cgstRate);
+  const sgst = parseRate(record.sgstRate);
+  const igst = parseRate(record.igstRate);
+
+  for (const code of codes) {
+    if (!code) {
+      continue;
+    }
+
+    const entry: HSNCode = {
+      code,
+      description: rawDescription,
+      cgst,
+      sgst,
+      igst,
+      cess: 0,
+    };
+
+    const existing = hsnCodeEntries.get(code);
+    if (!existing) {
+      hsnCodeEntries.set(code, entry);
+      continue;
+    }
+
+    const existingScore = (existing.cgst + existing.sgst + existing.igst) * existing.description.length;
+    const nextScore = (cgst + sgst + igst) * rawDescription.length;
+    if (nextScore > existingScore) {
+      hsnCodeEntries.set(code, entry);
+    }
+  }
+}
+
+export const hsnCodes: HSNCode[] = Array.from(hsnCodeEntries.values()).sort((a, b) => a.code.localeCompare(b.code));
+
+export const hsnCodeMap = new Map(hsnCodes.map((entry) => [entry.code, entry]));
+
+export { normalizeHsnCode };
 
 export const uomOptions = ["MTS", "KGS", "NOS", "PCS", "TONS", "QTLS", "BOXES", "BAGS"];
 

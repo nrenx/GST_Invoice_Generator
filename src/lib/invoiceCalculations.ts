@@ -47,6 +47,8 @@ export function calculateItemTotals(
   let sgstAmount = 0;
   let igstRate = 0;
   let igstAmount = 0;
+  let cessRate = item.cessRate ?? 0;
+  let cessAmount = 0;
   
   if (isInterstate) {
     // Interstate: Use IGST
@@ -59,9 +61,15 @@ export function calculateItemTotals(
     cgstAmount = (taxableValue * cgstRate) / 100;
     sgstAmount = (taxableValue * sgstRate) / 100;
   }
+
+  if (cessRate > 0) {
+    cessAmount = (taxableValue * cessRate) / 100;
+  } else {
+    cessRate = 0;
+  }
   
   // Calculate total amount
-  const totalAmount = taxableValue + cgstAmount + sgstAmount + igstAmount;
+  const totalAmount = taxableValue + cgstAmount + sgstAmount + igstAmount + cessAmount;
   
   return {
     id,
@@ -77,6 +85,8 @@ export function calculateItemTotals(
     sgstAmount,
     igstRate,
     igstAmount,
+    cessRate,
+    cessAmount,
     totalAmount
   };
 }
@@ -93,6 +103,7 @@ export function calculateInvoiceTotals(items: InvoiceItem[]) {
       totalCGST: acc.totalCGST + item.cgstAmount,
       totalSGST: acc.totalSGST + item.sgstAmount,
       totalIGST: acc.totalIGST + item.igstAmount,
+      totalCess: acc.totalCess + item.cessAmount,
       totalQuantity: acc.totalQuantity + item.quantity
     }),
     {
@@ -100,11 +111,12 @@ export function calculateInvoiceTotals(items: InvoiceItem[]) {
       totalCGST: 0,
       totalSGST: 0,
       totalIGST: 0,
+      totalCess: 0,
       totalQuantity: 0
     }
   );
   
-  const totalTax = totals.totalCGST + totals.totalSGST + totals.totalIGST;
+  const totalTax = totals.totalCGST + totals.totalSGST + totals.totalIGST + totals.totalCess;
   const grandTotal = totals.totalTaxableValue + totalTax;
   
   return {
