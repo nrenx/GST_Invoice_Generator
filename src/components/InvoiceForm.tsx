@@ -292,7 +292,7 @@ const getDefaultValues = (profile: Profile): InvoiceFormData => {
         termsAndConditions: parsedData?.termsAndConditions || baseDefaults.termsAndConditions,
       };
     } catch (error) {
-      console.error("Error parsing stored form data:", error);
+      // Clear corrupted data and use defaults
       window.localStorage.removeItem(storageKey);
     }
   }
@@ -429,7 +429,7 @@ export const InvoiceForm = ({ profile }: InvoiceFormProps) => {
         const storageKey = getFormStorageKey(profile.id);
         window.localStorage.setItem(storageKey, JSON.stringify(watchedFormData));
       } catch (error) {
-        console.error('Error saving form data to localStorage:', error);
+        // Silently fail if localStorage is unavailable
       }
     };
 
@@ -517,7 +517,7 @@ export const InvoiceForm = ({ profile }: InvoiceFormProps) => {
         window.localStorage.setItem(storageKey, JSON.stringify(data));
       }
     } catch (error) {
-      console.error('Error saving form data to localStorage:', error);
+      // Silently fail if localStorage is unavailable
     }
 
     const invoiceData: InvoiceData = {

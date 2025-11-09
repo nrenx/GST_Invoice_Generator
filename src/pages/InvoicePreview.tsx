@@ -40,7 +40,6 @@ const InvoicePreview = () => {
         setOriginalHTML(originalRendered);
         setDuplicateHTML(duplicateRendered);
       } catch (error) {
-        console.error("Failed to load template:", error);
         toast.error("Failed to load invoice template");
       }
     };
@@ -109,7 +108,6 @@ ${duplicateSections.body}
 
       toast.success("PDF downloaded successfully");
     } catch (error) {
-      console.error("PDF generation error:", error);
       toast.error("Failed to generate PDF");
     } finally {
       setIsGeneratingPdf(false);
