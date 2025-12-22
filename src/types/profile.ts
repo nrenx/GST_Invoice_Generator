@@ -18,6 +18,12 @@ export interface Profile {
   avatar?: string;
 }
 
+// Hardcoded PINs for default profiles
+export const PROFILE_PINS: Record<string, string> = {
+  narendra: '9640',
+  raja: '2018',
+};
+
 export const DEFAULT_PROFILES: Profile[] = [
   {
     id: 'narendra',

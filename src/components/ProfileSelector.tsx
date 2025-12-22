@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, User, RotateCcw } from "lucide-react";
+import { Plus, User, RotateCcw, Lock } from "lucide-react";
 import { Profile } from "@/types/profile";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { PinDialog } from "@/components/PinDialog";
 
 interface ProfileSelectorProps {
   profiles: Profile[];
@@ -13,9 +15,18 @@ interface ProfileSelectorProps {
 
 export const ProfileSelector = ({ profiles, onSelectProfile, onResetToDefaults }: ProfileSelectorProps) => {
   const navigate = useNavigate();
+  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
+  const [isPinDialogOpen, setIsPinDialogOpen] = useState(false);
 
-  const handleProfileClick = (profileId: string) => {
+  const handleProfileClick = (profile: Profile) => {
+    // Show PIN dialog
+    setSelectedProfile(profile);
+    setIsPinDialogOpen(true);
+  };
+
+  const handlePinSuccess = (profileId: string) => {
     onSelectProfile(profileId);
+    toast.success("Profile unlocked successfully!");
     navigate("/");
   };
 
@@ -60,11 +71,16 @@ export const ProfileSelector = ({ profiles, onSelectProfile, onResetToDefaults }
           {profiles.map((profile) => (
             <Card
               key={profile.id}
-              onClick={() => handleProfileClick(profile.id)}
+              onClick={() => handleProfileClick(profile)}
               className="group relative cursor-pointer bg-background/95 backdrop-blur-sm border-2 border-transparent hover:border-accent hover:shadow-2xl transition-all duration-300 overflow-hidden"
             >
               {/* Hover Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-br from-accent/0 via-accent/0 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              
+              {/* Lock Icon - indicates PIN protected */}
+              <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center">
+                <Lock className="w-4 h-4 text-accent" />
+              </div>
               
               <div className="relative p-8 space-y-6">
                 {/* Avatar */}
@@ -133,6 +149,14 @@ export const ProfileSelector = ({ profiles, onSelectProfile, onResetToDefaults }
           </Card>
         </div>
       </div>
+
+      {/* PIN Dialog */}
+      <PinDialog
+        isOpen={isPinDialogOpen}
+        onClose={() => setIsPinDialogOpen(false)}
+        profile={selectedProfile}
+        onSuccess={handlePinSuccess}
+      />
     </div>
   );
 };
