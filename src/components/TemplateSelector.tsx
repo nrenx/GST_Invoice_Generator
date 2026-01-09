@@ -1,12 +1,12 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { FileText, Briefcase, Truck, Scroll } from "lucide-react";
+import { FileText, Briefcase } from "lucide-react";
 
 interface TemplateSelectorProps {
   open: boolean;
   onClose: () => void;
-  onSelectTemplate: (template: "standard" | "professional" | "eway" | "antique") => void;
+  onSelectTemplate: (template: "standard" | "professional") => void;
 }
 
 export const TemplateSelector = ({ open, onClose, onSelectTemplate }: TemplateSelectorProps) => {
@@ -50,37 +50,6 @@ export const TemplateSelector = ({ open, onClose, onSelectTemplate }: TemplateSe
             </div>
           </Card>
 
-          <Card
-            className="cursor-pointer hover:shadow-lg transition-shadow p-6 border-2 hover:border-accent"
-            onClick={() => onSelectTemplate("eway")}
-          >
-            <div className="flex flex-col items-center gap-4">
-              <div className="w-16 h-16 rounded-lg bg-orange-500/10 flex items-center justify-center">
-                <Truck className="w-8 h-8 text-orange-600" />
-              </div>
-              <h3 className="text-xl font-semibold">E-Way Bill Template</h3>
-              <p className="text-sm text-muted-foreground text-center">
-                GST E-Way Bill compliant format with transport details
-              </p>
-              <Button variant="outline" className="w-full border-orange-600 text-orange-600 hover:bg-orange-50">Select</Button>
-            </div>
-          </Card>
-
-          <Card
-            className="cursor-pointer hover:shadow-lg transition-shadow p-6 border-2 hover:border-accent"
-            onClick={() => onSelectTemplate("antique")}
-          >
-            <div className="flex flex-col items-center gap-4">
-              <div className="w-16 h-16 rounded-lg bg-amber-700/10 flex items-center justify-center">
-                <Scroll className="w-8 h-8 text-amber-800" />
-              </div>
-              <h3 className="text-xl font-semibold">Antique Classic</h3>
-              <p className="text-sm text-muted-foreground text-center">
-                Timeless elegance with sophisticated vintage styling
-              </p>
-              <Button variant="outline" className="w-full border-amber-800 text-amber-800 hover:bg-amber-50">Select</Button>
-            </div>
-          </Card>
         </div>
       </DialogContent>
     </Dialog>

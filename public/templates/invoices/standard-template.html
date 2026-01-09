@@ -91,13 +91,26 @@
       padding-bottom: 4px;
     }
 
-    .detail-box p {
+    .detail-info-table {
+      width: 100%;
+      border-collapse: collapse;
       font-size: 9pt;
-      margin: 4px 0;
     }
 
-    .detail-box strong {
+    .detail-info-table tr {
+      line-height: 1.6;
+    }
+
+    .detail-info-table th {
+      text-align: left;
       font-weight: 600;
+      padding: 2px 8px 2px 0;
+      white-space: nowrap;
+      width: 120px;
+    }
+
+    .detail-info-table td {
+      padding: 2px 0;
     }
 
     .party-details {
@@ -120,6 +133,28 @@
       color: white;
       padding: 6px;
       margin: -12px -12px 10px -12px;
+    }
+
+    .party-info-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9pt;
+    }
+
+    .party-info-table tr {
+      line-height: 1.6;
+    }
+
+    .party-info-table th {
+      text-align: left;
+      font-weight: 600;
+      padding: 2px 8px 2px 0;
+      white-space: nowrap;
+      width: 80px;
+    }
+
+    .party-info-table td {
+      padding: 2px 0;
     }
 
     .items-table {
@@ -241,13 +276,17 @@
     <div class="invoice-details">
       <div class="detail-box">
         <h3>TAX INVOICE</h3>
-        <p><strong>Invoice No:</strong> {{INVOICE_NUMBER}}</p>
-        <p><strong>Invoice Date:</strong> {{INVOICE_DATE}}</p>
+        <table class="detail-info-table">
+          <tr><th>Invoice No</th><td>: {{INVOICE_NUMBER}}</td></tr>
+          <tr><th>Invoice Date</th><td>: {{INVOICE_DATE}}</td></tr>
+        </table>
       </div>
       <div class="detail-box">
         <h3>TRANSPORT DETAILS</h3>
-        <p><strong>Mode of Transport:</strong> {{TRANSPORT_MODE}}</p>
-        <p><strong>Vehicle Number:</strong> {{VEHICLE_NUMBER}}</p>
+        <table class="detail-info-table">
+          <tr><th>Mode of Transport</th><td>: {{TRANSPORT_MODE}}</td></tr>
+          <tr><th>Vehicle Number</th><td>: {{VEHICLE_NUMBER}}</td></tr>
+        </table>
       </div>
     </div>
 
@@ -255,17 +294,23 @@
     <div class="party-details">
       <div class="party-box">
         <h3>BILLED TO</h3>
-        <p><strong>{{RECEIVER_NAME}}</strong></p>
-        <p>{{RECEIVER_ADDRESS}}</p>
-        <p>{{RECEIVER_STATE}}</p>
-        <p><strong>GSTIN:</strong> {{RECEIVER_GSTIN}}</p>
+        <table class="party-info-table">
+          <tr><th>Name</th><td>: {{RECEIVER_NAME}}</td></tr>
+          <tr><th>Address</th><td>: {{RECEIVER_ADDRESS}}</td></tr>
+          <tr><th>GSTIN</th><td>: {{RECEIVER_GSTIN}}</td></tr>
+          <tr><th>State</th><td>: {{RECEIVER_STATE}}</td></tr>
+          <tr><th>State Code</th><td>: {{RECEIVER_STATE_CODE}}</td></tr>
+        </table>
       </div>
       <div class="party-box">
         <h3>SHIPPED TO</h3>
-        <p><strong>{{CONSIGNEE_NAME}}</strong></p>
-        <p>{{CONSIGNEE_ADDRESS}}</p>
-        <p>{{CONSIGNEE_STATE}}</p>
-        <p><strong>GSTIN:</strong> {{CONSIGNEE_GSTIN}}</p>
+        <table class="party-info-table">
+          <tr><th>Name</th><td>: {{CONSIGNEE_NAME}}</td></tr>
+          <tr><th>Address</th><td>: {{CONSIGNEE_ADDRESS}}</td></tr>
+          <tr><th>GSTIN</th><td>: {{CONSIGNEE_GSTIN}}</td></tr>
+          <tr><th>State</th><td>: {{CONSIGNEE_STATE}}</td></tr>
+          <tr><th>State Code</th><td>: {{CONSIGNEE_STATE_CODE}}</td></tr>
+        </table>
       </div>
     </div>
 
