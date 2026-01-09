@@ -40,7 +40,7 @@ export const DEFAULT_PROFILES: Profile[] = [
       email: 'bollineninarendragst@gmail.com',
       phone: ''
     },
-    termsAndConditions: '1. This is an electronically generated invoice.\n2. All disputes are subject to GUDUR jurisdiction only.\n3. If the Consignee makes any Inter State Sale, he has to pay GST himself.\n4. Goods once sold cannot be taken back or exchanged.\n5. Payment terms as per agreement between buyer and seller.'
+    termsAndConditions: '1. This is an electronically generated invoice.\n2. All disputes are subject to GUDUR jurisdiction only.\n3. Goods once sold cannot be taken back or exchanged.\n4. Payment to be made as agreed; ownership passes only after full payment.\n5. This invoice is issued in accordance with GST laws in force.'
   },
   {
     id: 'raja',
@@ -56,7 +56,7 @@ export const DEFAULT_PROFILES: Profile[] = [
       email: '',
       phone: '8106332018'
     },
-    termsAndConditions: '1. This is an electronically generated invoice.\n2. All disputes are subject to GUDUR jurisdiction only.\n3. If the Consignee makes any Inter State Sale, he has to pay GST himself.\n4. Goods once sold cannot be taken back or exchanged.\n5. Payment terms as per agreement between buyer and seller.'
+    termsAndConditions: '1. This is an electronically generated invoice.\n2. All disputes are subject to GUDUR jurisdiction only.\n3. Goods once sold cannot be taken back or exchanged.\n4. Payment to be made as agreed; ownership passes only after full payment.\n5. This invoice is issued in accordance with GST laws in force.'
   },
   {
     id: 'simhadri',
@@ -72,6 +72,6 @@ export const DEFAULT_PROFILES: Profile[] = [
       email: 'simhadrikw3@gmail.com',
       phone: ''
     },
-    termsAndConditions: '1. This is an electronically generated invoice.\n2. All disputes are subject to venkatagiri jurisdiction only.\n3. If the Consignee makes any Inter State Sale, he has to pay GST himself.\n4. Goods once sold cannot be taken back or exchanged.\n5. Payment terms as per agreement between buyer and seller.'
+    termsAndConditions: '1. This is an electronically generated invoice.\n2. All disputes are subject to venkatagiri jurisdiction only.\n3. Goods once sold cannot be taken back or exchanged.\n4. Payment to be made as agreed; ownership passes only after full payment.\n5. This invoice is issued in accordance with GST laws in force.'
   }
 ];
