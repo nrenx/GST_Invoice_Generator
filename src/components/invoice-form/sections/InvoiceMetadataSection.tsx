@@ -72,8 +72,8 @@ export const InvoiceMetadataSection = ({
                 <SelectValue placeholder="Select sale type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Interstate">Interstate</SelectItem>
-                <SelectItem value="Intrastate">Intrastate</SelectItem>
+                <SelectItem value="Interstate">Interstate - Outside State</SelectItem>
+                <SelectItem value="Intrastate">Intrastate - Within State</SelectItem>
               </SelectContent>
             </Select>
           </div>
