@@ -1,6 +1,6 @@
 import { InvoiceData } from "@/types/invoice";
 
-export type TemplateType = "standard" | "professional";
+export type TemplateType = "standard" | "professional" | "composition";
 
 export const loadTemplate = async (templateType: TemplateType): Promise<string> => {
   const basePath = import.meta.env.BASE_URL ?? "/";
@@ -87,6 +87,21 @@ export const injectDataIntoTemplate = (
         <td class="text-right">₹${formatCurrency(item.taxableValue)}</td>
         ${taxCells}
         <td class="text-right"><strong>₹${formatCurrency(item.totalAmount)}</strong></td>
+      </tr>
+    `;
+  }).join('');
+
+  // Composition scheme items rows (simplified - no tax columns)
+  const compositionItemsRows = invoiceData.items.map((item, index) => {
+    return `
+      <tr>
+        <td class="text-center">${index + 1}</td>
+        <td>${item.description}</td>
+        <td class="text-center">${item.hsnCode}</td>
+        <td class="text-right">${item.quantity.toFixed(2)}</td>
+        <td class="text-center">${item.uom}</td>
+        <td class="text-right">${formatCurrency(item.rate)}</td>
+        <td class="text-right">${formatCurrency(item.taxableValue)}</td>
       </tr>
     `;
   }).join('');
@@ -207,6 +222,19 @@ export const injectDataIntoTemplate = (
       .replace(/{{ITEMS_ROWS}}/g, dynamicItemsRows);
   } else {
     result = result.replace(/{{ITEMS_ROWS}}/g, detailedItemsRows);
+  }
+
+  // Handle composition scheme template (simplified items without tax columns)
+  const hasCompositionPlaceholder = template.includes("{{COMPOSITION_ITEMS_ROWS}}");
+  if (hasCompositionPlaceholder) {
+    // For composition scheme, grand total equals taxable value (no tax added)
+    const compositionGrandTotal = totalTaxableValue;
+    const compositionAmountInWords = numberToWords(Math.floor(compositionGrandTotal)) + ' Rupees Only';
+    
+    result = result
+      .replace(/{{COMPOSITION_ITEMS_ROWS}}/g, compositionItemsRows)
+      .replace(/{{GRAND_TOTAL}}/g, compositionGrandTotal.toFixed(2))
+      .replace(/{{AMOUNT_IN_WORDS}}/g, compositionAmountInWords);
   }
 
   return result;

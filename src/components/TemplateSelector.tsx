@@ -1,12 +1,12 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { FileText, Briefcase } from "lucide-react";
+import { FileText, Briefcase, Store } from "lucide-react";
 
 interface TemplateSelectorProps {
   open: boolean;
   onClose: () => void;
-  onSelectTemplate: (template: "standard" | "professional") => void;
+  onSelectTemplate: (template: "standard" | "professional" | "composition") => void;
 }
 
 export const TemplateSelector = ({ open, onClose, onSelectTemplate }: TemplateSelectorProps) => {
@@ -47,6 +47,25 @@ export const TemplateSelector = ({ open, onClose, onSelectTemplate }: TemplateSe
                 Classic Excel-based layout with traditional GST invoice format
               </p>
               <Button variant="outline" className="w-full">Select</Button>
+            </div>
+          </Card>
+
+          <Card
+            className="cursor-pointer hover:shadow-lg transition-shadow p-6 border-2 hover:border-emerald-500"
+            onClick={() => onSelectTemplate("composition")}
+          >
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-16 h-16 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                <Store className="w-8 h-8 text-emerald-600" />
+              </div>
+              <h3 className="text-xl font-semibold">Composition Scheme</h3>
+              <p className="text-sm text-muted-foreground text-center">
+                Bill of Supply for GST Composition Dealers - No tax collection on supplies
+              </p>
+              <div className="w-full space-y-1">
+                <Button variant="outline" className="w-full border-emerald-500 text-emerald-600 hover:bg-emerald-50">Select</Button>
+                <p className="text-xs text-emerald-600 text-center font-medium">For Small Businesses</p>
+              </div>
             </div>
           </Card>
 
