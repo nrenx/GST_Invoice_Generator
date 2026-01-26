@@ -10,4 +10,5 @@ export { ReceiverDetailsSection } from "./ReceiverDetailsSection";
 export { ConsigneeDetailsSection } from "./ConsigneeDetailsSection";
 export { InvoiceItemsSection } from "./InvoiceItemsSection";
 export { TermsAndConditionsSection } from "./TermsAndConditionsSection";
+export { SignatureSection } from "./SignatureSection";
 export { FormActionButtons } from "./FormActionButtons";

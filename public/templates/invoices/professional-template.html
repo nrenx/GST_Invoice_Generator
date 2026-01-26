@@ -453,6 +453,12 @@
       margin-bottom: 6px;
     }
 
+    .signature-image {
+      max-height: 50px;
+      max-width: 120px;
+      object-fit: contain;
+    }
+
     .signature-footer {
       text-align: center;
       font-weight: bold;
@@ -738,8 +744,8 @@
           </td>
           <td>
             <div class="signature-block">
-              <div class="signature-label">Mobile No: _____________</div>
-              <div class="signature-space"></div>
+              <div class="signature-label">For {{COMPANY_NAME}}</div>
+              <div class="signature-space">{{SIGNATURE_IMAGE}}</div>
               <div class="signature-footer">Authorized Signatory</div>
             </div>
           </td>

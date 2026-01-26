@@ -81,6 +81,9 @@ export interface InvoiceData {
   discount?: number;
   discountType?: 'percentage' | 'fixed';
   additionalCharges?: number;
+
+  // Signature
+  signatureImage?: string; // Base64 encoded image
 }
 
 export interface HSNCode {

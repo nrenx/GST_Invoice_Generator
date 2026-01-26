@@ -22,6 +22,7 @@ import {
   ConsigneeDetailsSection,
   InvoiceItemsSection,
   TermsAndConditionsSection,
+  SignatureSection,
   FormActionButtons,
 } from "./sections";
 
@@ -248,6 +249,7 @@ export const InvoiceForm = ({ profile }: InvoiceFormProps) => {
       consigneeStateCode: data.consigneeStateCode || "",
       items: data.items.map((item) => calculateItemTotals(item, data.saleType)),
       termsAndConditions: data.termsAndConditions || "",
+      signatureImage: data.signatureImage,
     };
 
     navigate("/preview", { state: invoiceData });
@@ -311,6 +313,9 @@ export const InvoiceForm = ({ profile }: InvoiceFormProps) => {
 
       {/* Section 7: Terms and Conditions */}
       <TermsAndConditionsSection register={register} />
+
+      {/* Section 8: Signature */}
+      <SignatureSection setValue={setValue} watch={watch} />
 
       {/* Action Buttons */}
       <FormActionButtons

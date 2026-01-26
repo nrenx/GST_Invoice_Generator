@@ -246,6 +246,16 @@
     .signature-space {
       margin: 40px 0 10px 0;
       border-bottom: 1px solid #000;
+      min-height: 50px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .signature-image {
+      max-height: 60px;
+      max-width: 150px;
+      object-fit: contain;
     }
 
     @media print {
@@ -354,7 +364,7 @@
       </div>
       <div class="signature-box">
         <h3>For {{COMPANY_NAME}}</h3>
-        <div class="signature-space"></div>
+        <div class="signature-space">{{SIGNATURE_IMAGE}}</div>
         <p>Authorized Signatory</p>
       </div>
     </div>

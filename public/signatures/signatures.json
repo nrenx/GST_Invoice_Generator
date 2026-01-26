@@ -1,0 +1,19 @@
+{
+  "signatures": [
+    {
+      "id": "sig-1",
+      "name": "Narendra",
+      "filename": "narendra.png"
+    },
+    {
+      "id": "sig-2",
+      "name": "Signature 2",
+      "filename": "signature-2.png"
+    },
+    {
+      "id": "sig-3",
+      "name": "Signature 3",
+      "filename": "signature-3.png"
+    }
+  ]
+}

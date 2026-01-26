@@ -96,6 +96,9 @@ export const invoiceSchema = z.object({
 
   // Terms
   termsAndConditions: z.string().default(TERMS_TEMPLATE),
+
+  // Signature
+  signatureImage: z.string().optional(),
 });
 
 export type InvoiceFormData = z.infer<typeof invoiceSchema>;

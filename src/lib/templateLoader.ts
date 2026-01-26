@@ -215,6 +215,12 @@ export const injectDataIntoTemplate = (
   .replace(/{{IGST_HEADER_LABEL}}/g, igstHeaderLabel)
   .replace(/{{IGST_HEADER_CLASS}}/g, igstHeaderClass);
 
+  // Handle signature image - different templates have different signature sizes
+  const signatureImageHTML = invoiceData.signatureImage
+    ? `<img src="${invoiceData.signatureImage}" alt="Authorized Signature" class="signature-image" />`
+    : '';
+  result = result.replace(/{{SIGNATURE_IMAGE}}/g, signatureImageHTML);
+
   if (hasDynamicTaxPlaceholders) {
     result = result
       .replace(/{{TAX_HEADERS}}/g, taxHeaders)
