@@ -1,4 +1,4 @@
-# GST Invoice Flow
+# GST Invoice Generator
 
 React application for generating GST-compliant tax invoices from profile-aware company data. The app streamlines invoice capture, renders professional templates, and exports polished PDFs that are ready to share with customers.
 
@@ -30,7 +30,7 @@ React application for generating GST-compliant tax invoices from profile-aware c
 
 ```sh
 git clone <repo-url>
-cd excel2web-invoice-flow
+cd GST_Invoice_Generator
 npm install            # or pnpm install / bun install
 ```
 

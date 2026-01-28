@@ -4,7 +4,7 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: mode === "production" ? "/excel2web-invoice-flow/" : "/",
+  base: mode === "production" ? "/GST_Invoice_Generator/" : "/",
   server: {
     host: "::",
     port: 8080,
