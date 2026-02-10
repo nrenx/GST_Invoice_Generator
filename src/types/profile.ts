@@ -24,6 +24,7 @@ export const PROFILE_PINS: Record<string, string> = {
   raja: '2018',
   simhadri: '6303',
   nageswarao: '9640',
+  nikil_babai: '9071',
 };
 
 export const DEFAULT_PROFILES: Profile[] = [
@@ -90,5 +91,21 @@ export const DEFAULT_PROFILES: Profile[] = [
       phone: ''
     },
     termsAndConditions: '1. This is an electronically generated invoice.\n2. All disputes are subject to Ulavapadu jurisdiction only.\n3. Goods once sold will not be taken back or exchanged.\n4. Payment shall be made as agreed; ownership passes only after full payment.\n5. This invoice is issued in accordance with GST laws in force in India.'
+  },
+  {
+    id: 'nikil_babai',
+    name: 'NIKHIL BABAI',
+    companyDetails: {
+      companyName: 'NSR EXPORTS & IMPORTS',
+      address: 'D.NO.167, Idulapalli, MITTATMAKUR POST, Tirupati, A.P - 524409',
+      city: 'Tirupati',
+      state: 'Andhra Pradesh',
+      stateCode: '37',
+      pincode: '524409',
+      gstin: '37DLLPC3560A1ZG',
+      email: '',
+      phone: '9640390719'
+    },
+    termsAndConditions: '1. This is an electronically generated invoice.\n2. All disputes are subject to Tirupati jurisdiction only.\n3. Goods once sold will not be taken back or exchanged.\n4. Payment shall be made as agreed; ownership passes only after full payment.\n5. This invoice is issued in accordance with GST laws in force in India.'
   }
 ];
