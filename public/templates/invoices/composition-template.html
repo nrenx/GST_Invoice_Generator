@@ -490,6 +490,29 @@
       font-size: 10px;
     }
 
+    /* E. & O.E. Footer */
+    .eoe-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 10px;
+      font-size: 8px;
+      color: #666;
+      border: 2px solid #000;
+      border-top: none;
+      background: #fafafa;
+    }
+
+    .eoe-footer .eoe-left {
+      font-weight: 600;
+      font-style: italic;
+      letter-spacing: 0.5px;
+    }
+
+    .eoe-footer .eoe-right {
+      font-style: italic;
+    }
+
     @media print {
       body {
         margin: 0;
@@ -576,6 +599,16 @@
           <td class="metadata-value-cell">{{LR_NUMBER}}</td>
           <td class="metadata-label-cell">P.O Number</td>
           <td class="metadata-value-cell">{{PO_NUMBER}}</td>
+        </tr>
+        <tr>
+          <td class="metadata-label-cell">E-Way Bill</td>
+          <td class="metadata-value-cell">{{EWAY_BILL_NUMBER}}</td>
+          <td class="metadata-label-cell">Reverse Charge</td>
+          <td class="metadata-value-cell">{{REVERSE_CHARGE}}</td>
+          <td class="metadata-label-cell">Sale Type</td>
+          <td class="metadata-value-cell">{{SALE_TYPE}}</td>
+          <td class="metadata-label-cell">Due Date</td>
+          <td class="metadata-value-cell">{{DUE_DATE}}</td>
         </tr>
       </tbody>
     </table>
@@ -666,7 +699,7 @@
           <td class="text-right"><strong>{{TOTAL_QUANTITY}}</strong></td>
           <td></td>
           <td></td>
-          <td class="text-right"><strong>{{GRAND_TOTAL}}</strong></td>
+          <td class="text-right"><strong>{{TOTAL_TAXABLE_VALUE}}</strong></td>
         </tr>
       </tbody>
     </table>
@@ -692,11 +725,11 @@
                 </tr>
                 <tr>
                   <td>Discount (if any):</td>
-                  <td>₹ 0.00</td>
+                  <td>₹ {{DISCOUNT}}</td>
                 </tr>
                 <tr>
                   <td>Additional Charges:</td>
-                  <td>₹ 0.00</td>
+                  <td>₹ {{ADDITIONAL_CHARGES}}</td>
                 </tr>
                 <tr class="grand-total-row">
                   <td>Grand Total:</td>
@@ -735,6 +768,12 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- E. & O.E. Footer -->
+    <div class="eoe-footer">
+      <span class="eoe-left">E. & O.E. — Subject to {{COMPANY_STATE}} Jurisdiction</span>
+      <span class="eoe-right">This is a Computer Generated Bill of Supply</span>
+    </div>
   </div>
 </body>
 </html>

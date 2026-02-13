@@ -25,6 +25,7 @@ export const PROFILE_PINS: Record<string, string> = {
   simhadri: '6303',
   nageswarao: '9640',
   nikil_babai: '9071',
+  padmavathi: '9849',
 };
 
 export const DEFAULT_PROFILES: Profile[] = [
@@ -105,6 +106,22 @@ export const DEFAULT_PROFILES: Profile[] = [
       gstin: '37DLLPC3560A1ZG',
       email: '',
       phone: '9640390719'
+    },
+    termsAndConditions: '1. This is an electronically generated invoice.\n2. All disputes are subject to Tirupati jurisdiction only.\n3. Goods once sold will not be taken back or exchanged.\n4. Payment shall be made as agreed; ownership passes only after full payment.\n5. This invoice is issued in accordance with GST laws in force in India.'
+  },
+  {
+    id: 'padmavathi',
+    name: 'Padmavathi',
+    companyDetails: {
+      companyName: 'PADMAVATHI ENTERPRISES',
+      address: '191, Guduru, Mittathmakuru, Tirupati, Andhra Pradesh - 524409',
+      city: 'Tirupati',
+      state: 'Andhra Pradesh',
+      stateCode: '37',
+      pincode: '524409',
+      gstin: '37ESPPB0861K1ZF',
+      email: 'bollinenipadmavathi1981@gmail.com',
+      phone: ''
     },
     termsAndConditions: '1. This is an electronically generated invoice.\n2. All disputes are subject to Tirupati jurisdiction only.\n3. Goods once sold will not be taken back or exchanged.\n4. Payment shall be made as agreed; ownership passes only after full payment.\n5. This invoice is issued in accordance with GST laws in force in India.'
   }

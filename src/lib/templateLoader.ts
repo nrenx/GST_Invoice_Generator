@@ -44,9 +44,20 @@ export const injectDataIntoTemplate = (
   const totalIGST = invoiceData.items.reduce((sum, item) => sum + item.igstAmount, 0);
   const totalCess = invoiceData.items.reduce((sum, item) => sum + item.cessAmount, 0);
   const totalTax = totalCGST + totalSGST + totalIGST + totalCess;
-  const grandTotal = totalTaxableValue + totalTax;
   const totalQuantity = invoiceData.items.reduce((sum, item) => sum + item.quantity, 0);
   const totalAmount = invoiceData.items.reduce((sum, item) => sum + item.taxableValue, 0);
+
+  // Detect composition template — no tax should be added to grand total
+  const isCompositionTemplate = template.includes("{{COMPOSITION_ITEMS_ROWS}}");
+
+  const discount = invoiceData.discount ?? 0;
+  const additionalCharges = invoiceData.additionalCharges ?? 0;
+
+  // For composition: Grand Total = Total Value of Supply - Discount + Additional Charges (NO tax)
+  // For regular: Grand Total = Total Taxable Value + Tax
+  const grandTotal = isCompositionTemplate
+    ? totalTaxableValue - discount + additionalCharges
+    : totalTaxableValue + totalTax;
   const amountInWords = numberToWords(Math.floor(grandTotal)) + ' Rupees Only';
 
   // Build items rows
@@ -176,6 +187,7 @@ export const injectDataIntoTemplate = (
     .replace(/{{INVOICE_TYPE}}/g, invoiceData.invoiceType)
     .replace(/{{SALE_TYPE}}/g, invoiceData.saleType)
     .replace(/{{REVERSE_CHARGE}}/g, invoiceData.reverseCharge)
+    .replace(/{{DUE_DATE}}/g, invoiceData.dueDate || '')
     .replace(/{{TRANSPORT_MODE}}/g, invoiceData.transportMode || '')
     .replace(/{{VEHICLE_NUMBER}}/g, invoiceData.vehicleNumber || '')
     .replace(/{{TRANSPORTER_NAME}}/g, invoiceData.transporterName || '')
@@ -207,6 +219,8 @@ export const injectDataIntoTemplate = (
     .replace(/{{TOTAL_TAX}}/g, totalTax.toFixed(2))
     .replace(/{{GRAND_TOTAL}}/g, grandTotal.toFixed(2))
     .replace(/{{AMOUNT_IN_WORDS}}/g, amountInWords)
+    .replace(/{{DISCOUNT}}/g, discount.toFixed(2))
+    .replace(/{{ADDITIONAL_CHARGES}}/g, additionalCharges.toFixed(2))
   .replace(/{{TERMS_AND_CONDITIONS}}/g, invoiceData.termsAndConditions || '')
   .replace(/{{CGST_HEADER_LABEL}}/g, cgstHeaderLabel)
   .replace(/{{CGST_HEADER_CLASS}}/g, cgstHeaderClass)
@@ -231,16 +245,8 @@ export const injectDataIntoTemplate = (
   }
 
   // Handle composition scheme template (simplified items without tax columns)
-  const hasCompositionPlaceholder = template.includes("{{COMPOSITION_ITEMS_ROWS}}");
-  if (hasCompositionPlaceholder) {
-    // For composition scheme, grand total equals taxable value (no tax added)
-    const compositionGrandTotal = totalTaxableValue;
-    const compositionAmountInWords = numberToWords(Math.floor(compositionGrandTotal)) + ' Rupees Only';
-    
-    result = result
-      .replace(/{{COMPOSITION_ITEMS_ROWS}}/g, compositionItemsRows)
-      .replace(/{{GRAND_TOTAL}}/g, compositionGrandTotal.toFixed(2))
-      .replace(/{{AMOUNT_IN_WORDS}}/g, compositionAmountInWords);
+  if (isCompositionTemplate) {
+    result = result.replace(/{{COMPOSITION_ITEMS_ROWS}}/g, compositionItemsRows);
   }
 
   // Handle interstate template (IGST-only layout)
